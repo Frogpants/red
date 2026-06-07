@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../math/essentials.hpp"
+#include "shader.hpp"
 
 
 
@@ -32,11 +33,14 @@ private:
 
     std::vector<Vertex> vertices;
 
+    int MAX_VERTICES;
+
 public:
     vec4 clear;
 
     Render() {
         clear = vec4(vec3(0.0), 1.0);
+        MAX_VERTICES = 3000000;
     }
     
     void init() {
