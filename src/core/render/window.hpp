@@ -4,20 +4,8 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include "../math/essentials.hpp"
-
-
-struct Vertex {
-    vec2 pos;
-    vec4 color = vec4(0.0);
-    vec2 uv;
-};
-
-struct Tri {
-    Vertex v1;
-    Vertex v2;
-    Vertex v3;
-};
 
 
 
@@ -29,6 +17,15 @@ private:
     int height;
 
     std::string title;
+
+    void destroy() {
+        if (window != nullptr) {
+            glfwDestroyWindow(window);
+            window = nullptr;
+        }
+
+        glfwTerminate();
+    }
 
     int getKeyID(std::string key) {
         // Convert to lowercase for case-insensitive comparison
@@ -43,7 +40,7 @@ private:
         }
         
         // Function keys
-        if (key.substr(0, 2) == "f" && key.length() <= 3) {
+        if (!key.empty() && key[0] == 'f' && key.length() <= 3) {
             int fkey = std::stoi(key.substr(1));
             if (fkey >= 1 && fkey <= 25) {
                 return GLFW_KEY_F1 + (fkey - 1);
@@ -99,16 +96,18 @@ public:
     }
 
     ~Window() {
-        close();
+        destroy();
     }
 
     bool isOpen() {
-        return !glfwWindowShouldClose(window);
+        return window != nullptr && !glfwWindowShouldClose(window);
     }
 
     void close() {
-        glfwDestroyWindow(window);
-        glfwTerminate();
+        if (window != nullptr) {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+        destroy();
     }
 
     void pollEvents() {
@@ -121,7 +120,7 @@ public:
 
     bool isKeyPressed(std::string key) {
         int k = getKeyID(key);
-        return glfwGetKey(window, k) == GLFW_PRESS;
+        return glfwGetKey(window, k) == GLFW_PRESS || glfwGetKey(window, k) == GLFW_REPEAT;
     }
 
     GLFWwindow* getNativeWindow();

@@ -6,12 +6,14 @@ int main() {
     Window w = Window(1280, 720, "Red Noise");
 
     while (w.isOpen()) {
-        std::cout << "WORKS!!!";
+        w.pollEvents();
 
         if (w.isKeyPressed("esc")) {
             break;
         }
     }
+
+    w.close();
 
     return 0;
 }
