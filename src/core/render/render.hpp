@@ -12,7 +12,7 @@
 
 
 struct Vertex {
-    vec3 pos;
+    vec2 pos;
     vec4 color;
 };
 
@@ -40,7 +40,7 @@ public:
 
     Render() {
         clear = vec4(vec3(0.0), 1.0);
-        MAX_VERTICES = 3000000;
+        MAX_VERTICES = 3000;
     }
     
     void init() {
@@ -52,11 +52,13 @@ public:
 
         glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
         glEnableVertexAttribArray(0);
 
         glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
         glEnableVertexAttribArray(1);
+
+        shader.load();
     }
 
     void beginFrame() {
@@ -78,13 +80,13 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     }
 
-    void drawTri(vec3 a, vec3 b, vec3 c, vec4 color) {
+    void drawTri(vec2 a, vec2 b, vec2 c, vec4 color) {
         vertices.push_back({a, color});
         vertices.push_back({b, color});
         vertices.push_back({c, color});
     }
 
-    void drawLine(vec3 start, vec3 end, vec4 color) {
+    void drawLine(vec2 start, vec2 end, vec4 color) {
         vertices.push_back({start, color});
         vertices.push_back({end, color});
     }

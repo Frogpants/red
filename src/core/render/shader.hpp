@@ -19,8 +19,8 @@ struct Uniform {
 
 class Shader {
 private:
-    std::string vert = "shaders/vert.glsl";
-    std::string frag = "shaders/frag.glsl";
+    std::string vert = "src/core/render/shaders/vert.glsl";
+    std::string frag = "src/core/render/shaders/frag.glsl";
 
     std::string vertCode;
     std::string fragCode;
@@ -75,7 +75,7 @@ public:
         vertCode = openFile(vert);
 
         const char* vertSource = vertCode.c_str();
-        glShaderSource(vertShader, 1, &vertsource, nullptr);
+        glShaderSource(vertShader, 1, &vertSource, nullptr);
         glCompileShader(vertShader);
 
 
@@ -83,7 +83,7 @@ public:
         fragCode = openFile(frag);
 
         const char* fragSource = fragCode.c_str();
-        glShaderSource(fragShader, 1, &fragsource, nullptr);
+        glShaderSource(fragShader, 1, &fragSource, nullptr);
         glCompileShader(fragShader);
 
 

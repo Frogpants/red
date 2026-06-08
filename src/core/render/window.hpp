@@ -28,10 +28,8 @@ private:
     }
 
     int getKeyID(std::string key) {
-        // Convert to lowercase for case-insensitive comparison
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
         
-        // Alphanumeric keys
         if (key.length() == 1 && key[0] >= 'a' && key[0] <= 'z') {
             return GLFW_KEY_A + (key[0] - 'a');
         }
@@ -39,7 +37,6 @@ private:
             return GLFW_KEY_0 + (key[0] - '0');
         }
         
-        // Function keys
         if (!key.empty() && key[0] == 'f' && key.length() <= 3) {
             int fkey = std::stoi(key.substr(1));
             if (fkey >= 1 && fkey <= 25) {
@@ -47,7 +44,6 @@ private:
             }
         }
         
-        // Named keys
         if (key == "escape") return GLFW_KEY_ESCAPE;
         if (key == "esc") return GLFW_KEY_ESCAPE;
         if (key == "enter" || key == "return") return GLFW_KEY_ENTER;
@@ -70,13 +66,25 @@ private:
         if (key == "caps") return GLFW_KEY_CAPS_LOCK;
         if (key == "numlock") return GLFW_KEY_NUM_LOCK;
         
-        // Return -1 if key not found
         return -1;
+    }
+
+    int getMouseID(int type) {
+        if (type == 0) {
+            return GLFW_MOUSE_BUTTON_LEFT;
+        } else if (type == 1) {
+            return GLFW_MOUSE_BUTTON_MIDDLE;
+        } else if (type == 2) {
+            return GLFW_MOUSE_BUTTON_RIGHT;
+        }
+
+        return GLFW_MOUSE_BUTTON_LEFT;
     }
 
 public:
 
     float deltaTime;
+    vec2 mouse;
 
     Window(int width, int height, std::string title) {
         glfwInit();
@@ -111,6 +119,9 @@ public:
     }
 
     void pollEvents() {
+        double mouseX, mouseY;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+        mouse = vec2(mouseX, mouseY);
         glfwPollEvents();
     }
 
@@ -120,7 +131,20 @@ public:
 
     bool isKeyPressed(std::string key) {
         int k = getKeyID(key);
-        return glfwGetKey(window, k) == GLFW_PRESS || glfwGetKey(window, k) == GLFW_REPEAT;
+        return glfwGetKey(window, k) == GLFW_PRESS;
+    }
+
+    bool isKeyDown(std::string key) {
+        int k = getKeyID(key);
+        return glfwGetKey(window, k) == GLFW_REPEAT;
+    }
+
+    bool mouseDown(int type) {
+        return glfwGetMouseButton(window, getMouseID(type)) == GLFW_PRESS;
+    }
+
+    bool mouseDown() {
+        return glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
     }
 
     GLFWwindow* getNativeWindow();
