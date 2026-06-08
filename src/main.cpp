@@ -14,7 +14,7 @@ int main() {
         w.pollEvents();
         render.beginFrame();
 
-        render.drawTri(vec2(0.0), vec2(1.0), vec2(0.5), vec4(vec3(0.0), 1.0));
+        render.drawTri(vec2(0.0), vec2(1.0), vec2(0.0, 1.0), vec4(vec3(0.0), 1.0));
 
 
 

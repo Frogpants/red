@@ -40,7 +40,7 @@ public:
 
     Render() {
         clear = vec4(vec3(0.0), 1.0);
-        MAX_VERTICES = 3000;
+        MAX_VERTICES = 3;
     }
     
     void init() {
