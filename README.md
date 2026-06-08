@@ -1,1 +1,3 @@
 # red
+
+run `make help`
