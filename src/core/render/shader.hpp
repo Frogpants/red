@@ -57,7 +57,7 @@ private:
 
     GLint checkSaved(GLchar* name) {
         GLint result;
-        for (int i = 0; i < locations.size(); i++) {
+        for (size_t i = 0; i < locations.size(); i++) {
             Uniform u = locations[i];
             if (u.name == name) {
                 result = u.location;

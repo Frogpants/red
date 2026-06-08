@@ -41,7 +41,7 @@ public:
 
     Render() {
         clear = vec4(vec3(0.0), 1.0);
-        MAX_VERTICES = 3;
+        MAX_VERTICES = 300;
     }
     
     void init() {
@@ -88,6 +88,24 @@ public:
         vertices.push_back({a, color, vec2(0.0)});
         vertices.push_back({b, color, vec2(0.0, 1.0)});
         vertices.push_back({c, color, vec2(1.0)});
+    }
+
+    void drawQuad(vec2 a, vec2 b, vec2 c, vec2 d, vec4 color) {
+        vertices.push_back({a, color, vec2(0.0)});
+        vertices.push_back({b, color, vec2(0.0, 1.0)});
+        vertices.push_back({c, color, vec2(1.0)});
+
+        vertices.push_back({a, color, vec2(0.0)});
+        vertices.push_back({d, color, vec2(1.0, 0.0)});
+        vertices.push_back({c, color, vec2(1.0)});
+    }
+
+    void drawRect(vec2 pos, vec2 size, vec4 color) {
+        vec2 a = pos - size;
+        vec2 b = pos - vec2(size.x, -size.y);
+        vec2 c = pos + size;
+        vec2 d = pos + vec2(size.x, -size.y);
+        drawQuad(a, b, c, d, color);
     }
 
     void drawLine(vec2 start, vec2 end, vec4 color) {
