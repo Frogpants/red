@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "core/render/window.hpp"
 #include "core/render/render.hpp"
 

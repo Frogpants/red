@@ -14,6 +14,7 @@
 struct Vertex {
     vec2 pos;
     vec4 color;
+    vec2 uv;
 };
 
 struct Tri {
@@ -58,6 +59,9 @@ public:
         glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
         glEnableVertexAttribArray(1);
 
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+        glEnableVertexAttribArray(2);
+
         shader.load();
     }
 
@@ -81,14 +85,14 @@ public:
     }
 
     void drawTri(vec2 a, vec2 b, vec2 c, vec4 color) {
-        vertices.push_back({a, color});
-        vertices.push_back({b, color});
-        vertices.push_back({c, color});
+        vertices.push_back({a, color, vec2(0.0)});
+        vertices.push_back({b, color, vec2(0.0, 1.0)});
+        vertices.push_back({c, color, vec2(1.0)});
     }
 
     void drawLine(vec2 start, vec2 end, vec4 color) {
-        vertices.push_back({start, color});
-        vertices.push_back({end, color});
+        vertices.push_back({start, color, vec2(0.0)});
+        vertices.push_back({end, color, vec2(1.0)});
     }
 
 };
