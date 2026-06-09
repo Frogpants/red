@@ -687,6 +687,10 @@ inline vec4 degrees(const vec4& v) {
 //     return std::sin(x);
 // }
 
+inline vec2 sin(vec2 v) {
+    return vec2(sin(v.x), sin(v.y));
+}
+
 // inline float cos(float x) {
 //     return std::cos(x);
 // }
