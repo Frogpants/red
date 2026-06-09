@@ -81,12 +81,24 @@ private:
         return GLFW_MOUSE_BUTTON_LEFT;
     }
 
+    static void FramebufferResizeCallback(GLFWwindow* window, int newWidth, int newHeight) {
+        Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+        self->width = newWidth;
+        self->height = newHeight;
+
+        glViewport(0, 0, newWidth, newHeight);
+    }
+
 public:
 
     float deltaTime;
     vec2 mouse;
 
-    Window(int width, int height, std::string title) {
+    Window(int _width, int _height, std::string title) {
+        width = _width;
+        height = _height;
+        
         glfwInit();
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -99,6 +111,10 @@ public:
         glewExperimental = GL_TRUE;
         glewInit();
         glViewport(0, 0, width, height);
+
+        glfwSetWindowUserPointer(window, this);
+
+        glfwSetFramebufferSizeCallback(window, FramebufferResizeCallback);
 
         glEnable(GL_DEPTH_TEST);
     }
@@ -121,9 +137,12 @@ public:
     void pollEvents() {
         double mouseX, mouseY;
         glfwGetCursorPos(window, &mouseX, &mouseY);
-        float w = 1280.0;
-        float h = 720.0;
-        mouse = (vec2(mouseX, mouseY) - vec2(w/2, h/2)) / vec2(w/2, -h/2);
+
+        float w = static_cast<float>(width);
+        float h = static_cast<float>(height);
+
+        mouse = (vec2((float)mouseX, (float)mouseY) - vec2(w * 0.5f, h * 0.5f)) / vec2(w * 0.5f, -h * 0.5f);
+
         glfwPollEvents();
     }
 
