@@ -7,12 +7,14 @@
 #include <GLFW/glfw3.h>
 
 #include "../math/essentials.hpp"
+#include "../files/model.hpp"
+
 #include "shader.hpp"
 
 
 
 struct Vertex {
-    vec2 pos;
+    vec2 position;
     vec4 color;
     vec2 uv;
 };
@@ -23,6 +25,10 @@ struct Tri {
     Vertex v3;
 };
 
+struct Model {
+    std::string name;
+    Mesh mesh;
+};
 
 
 class Render {
@@ -33,8 +39,29 @@ private:
     Shader shader;
 
     std::vector<Vertex> vertices;
+    std::vector<Model> models;
 
     int MAX_VERTICES;
+
+    Mesh checkModel(std::string name) {
+        Mesh result;
+        for (size_t i = 0; i < models.size(); i++) {
+            Model m = models[i];
+            if (m.name == name) {
+                result = m.mesh;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    void cache(std::string path, std::string name) {
+        Model m;
+        m.mesh = LoadOBJ(path);
+        m.name = name;
+        models.push_back(m);
+    }
 
 public:
     vec4 clear;
@@ -111,6 +138,11 @@ public:
     void drawLine(vec2 start, vec2 end, vec4 color) {
         vertices.push_back({start, color, vec2(0.0)});
         vertices.push_back({end, color, vec2(1.0)});
+    }
+
+    void drawMesh(Mesh& mesh) {
+        shader.bind();
+        mesh.draw();
     }
 
 };
