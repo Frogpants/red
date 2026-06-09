@@ -683,17 +683,17 @@ inline vec4 degrees(const vec4& v) {
 }
 
 
-inline float sin(float x) {
-    return std::sin(x);
-}
+// inline float sin(float x) {
+//     return std::sin(x);
+// }
 
-inline float cos(float x) {
-    return std::cos(x);
-}
+// inline float cos(float x) {
+//     return std::cos(x);
+// }
 
-inline float tan(float x) {
-    return std::tan(x);
-}
+// inline float tan(float x) {
+//     return std::tan(x);
+// }
 
 
 inline float mix(float x, float y, float a) {
@@ -701,9 +701,9 @@ inline float mix(float x, float y, float a) {
 }
 
 
-inline float sqrt(float x) {
-    return std::sqrt(x);
-}
+// inline float sqrt(float x) {
+//     return std::sqrt(x);
+// }
 
 inline vec2 sqrt(const vec2& v) {
     return vec2(sqrt(v.x), sqrt(v.y));

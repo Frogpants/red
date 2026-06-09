@@ -7,6 +7,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <stb/stb_image.h>
 
 #include "../math/essentials.hpp"
 
@@ -14,6 +15,11 @@
 struct Uniform {
     GLchar* name;
     GLint location;
+};
+
+struct Texture {
+    std::string path;
+    GLuint texture;
 };
 
 
@@ -30,6 +36,7 @@ private:
 
     GLuint program;
 
+    std::vector<Texture> textures;
     std::vector<Uniform> locations;
 
     std::string openFile(std::string path) {
@@ -66,6 +73,63 @@ private:
         }
 
         return result;
+    }
+
+    GLuint getTex(std::string path) {
+        GLuint result;
+        for (size_t i = 0; i < textures.size(); i++) {
+            Texture t = textures[i];
+            if (t.path == path) {
+                result = t.texture;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    GLuint loadTexture(const char* path) {
+        int width, height, channels;
+
+        stbi_set_flip_vertically_on_load(true);
+
+        unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
+
+        if (!data) {
+            std::cout << "Failed to load image: " << path << std::endl;
+            return 0;
+        }
+
+        GLenum format;
+
+        if (channels == 1) {
+            format = GL_RED;
+        } else if (channels == 3) {
+            format = GL_RGB;
+        } else if (channels == 4) {
+            format = GL_RGBA;
+        } else {
+            stbi_image_free(data);
+            return 0;
+        }
+
+        GLuint texture;
+
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        stbi_image_free(data);
+
+        return texture;
     }
 
 public:
@@ -107,6 +171,16 @@ public:
 
     void bind() {
         glUseProgram(program);
+    }
+
+    void addTex(const char* path) {
+        GLuint texture = loadTexture(path);
+        textures.push_back({path, texture});
+
+        glUseProgram(program);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
     }
 
     void setUniform(GLchar* name, float inp) {
@@ -157,5 +231,15 @@ public:
             l = location;
         }
         glUniform1i(l, inp);
+    }
+
+    void setUniform(GLchar* name, std::string inp) {
+        GLint l = checkSaved(name);
+        if (!l) {
+            GLint location = glGetUniformLocation(program, name);
+            cache(name, location);
+            l = location;
+        }
+        glUniform1i(l, getTex(inp));
     }
 };

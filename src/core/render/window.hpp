@@ -121,7 +121,9 @@ public:
     void pollEvents() {
         double mouseX, mouseY;
         glfwGetCursorPos(window, &mouseX, &mouseY);
-        mouse = vec2(mouseX, mouseY);
+        float w = 1280.0;
+        float h = 720.0;
+        mouse = (vec2(mouseX, mouseY) - vec2(w/2, h/2)) / vec2(w/2, -h/2);
         glfwPollEvents();
     }
 

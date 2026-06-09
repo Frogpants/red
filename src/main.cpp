@@ -1,5 +1,7 @@
 #include <iostream>
 
+#define STB_IMAGE_IMPLEMENTATION
+
 #include "core/render/window.hpp"
 #include "core/render/render.hpp"
 
@@ -38,11 +40,16 @@ int main() {
                 vel.x += -speed;
             }
 
-            vel = vel * 0.8;
+            vel = vel * 0.9;
             player = player + vel;
         }
 
+        
         render.drawRect(player, vec2(0.05 / aspect, 0.05), vec4(vec3(0.0), 1.0));
+
+        vec2 p = floor(w.mouse * 16.0) / 16.0;
+
+        render.drawRect(p, vec2(0.01 / aspect, 0.01), vec4(vec3(0.0), 1.0));
 
         if (w.isKeyPressed("esc")) {
             break;

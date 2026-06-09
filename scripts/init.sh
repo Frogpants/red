@@ -5,13 +5,20 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 install_packages() {
     if ! command -v apt-get >/dev/null 2>&1; then
-        echo "Unsupported package manager. Install g++, pkg-config, libglew-dev, libglfw3-dev, and libgl1-mesa-dev manually."
+        echo "Unsupported package manager. Install dependencies manually."
         return 1
     fi
 
     local missing_packages=()
 
-    for package_name in build-essential pkg-config libglew-dev libglfw3-dev libgl1-mesa-dev; do
+    for package_name in \
+        build-essential \
+        pkg-config \
+        libglew-dev \
+        libglfw3-dev \
+        libgl1-mesa-dev \
+        libstb-dev
+    do
         if ! dpkg -s "$package_name" >/dev/null 2>&1; then
             missing_packages+=("$package_name")
         fi
