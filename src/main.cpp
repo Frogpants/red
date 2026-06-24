@@ -6,9 +6,9 @@
 #include "core/render/render.hpp"
 
 #include "core/math/essentials.hpp"
+#include "engine/mobs/player.hpp"
 
-vec2 player = vec2(0.0);
-vec2 vel = vec2(0.0);
+Player player(0.001, 100);
 
 int main() {
     Window w = Window(1280, 720, "Red Noise");
@@ -16,7 +16,6 @@ int main() {
     render.init();
 
     float aspect = 1280.0/720.0;
-    float speed = 0.001;
 
     int tick = 0;
 
@@ -27,29 +26,25 @@ int main() {
         tick += 1;
 
         if (tick % 5 == 0) {
-            if (w.isKeyPressed("w")) {
-                vel.y += speed;
-            }
-            if (w.isKeyPressed("s")) {
-                vel.y += -speed;
-            }
-            if (w.isKeyPressed("d")) {
-                vel.x += speed;
-            }
-            if (w.isKeyPressed("a")) {
-                vel.x += -speed;
+
+            if (player.stamina < 0.0) {
+                player.stamina = 0.0;
+            } else if (player.stamina > 100.0) {
+                player.stamina = 100.0;
+            } else {
+                player.stamina += .025;
             }
 
-            vel = vel * 0.9;
-            player = player + vel;
+            player.checkMovement(w);
         }
 
-        
-        render.drawRect(player, vec2(0.05 / aspect, 0.05), vec4(vec3(0.0), 1.0));
+        render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(vec3(0.0), 1.0));
 
         vec2 p = floor(w.mouse * 16.0) / 16.0;
 
         render.drawRect(w.mouse, vec2(0.0125 / aspect, 0.0125), vec4(vec3(0.0), 1.0));
+
+        render.drawRect(vec2(0, .8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0, 206.0, 235.0, 1.0));
 
         if (w.isKeyPressed("esc")) {
             break;
