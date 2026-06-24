@@ -12,7 +12,7 @@ out vec4 vertexColor;
 out vec2 vUV;
 
 
-vec2 project() {
+vec3 project() {
     vec3 p = position - cam;
 
     vec3 trig = radians(rot);
@@ -35,12 +35,12 @@ vec2 project() {
     p.x = tx * cos(trig.z) - ty * sin(trig.z);
     p.y = tx * sin(trig.z) + ty * cos(trig.z);
 
-    return p.xy * f;
+    return vec3(p.xy * f, p.z);
 }
 
 void main()
 {
-    gl_Position = vec4(project(), 0.0, 1.0);
+    gl_Position = vec4(project(), 1.0);
 
     vertexColor = color;
 

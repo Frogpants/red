@@ -25,8 +25,8 @@ struct Texture {
 
 class Shader {
 private:
-    std::string vert = "src/core/render/shaders/test/vert.glsl";
-    std::string frag = "src/core/render/shaders/test/frag.glsl";
+    std::string vert = "src/core/render/shaders/game/vert.glsl";
+    std::string frag = "src/core/render/shaders/game/frag.glsl";
 
     std::string vertCode;
     std::string fragCode;
@@ -63,16 +63,13 @@ private:
     }
 
     GLint checkSaved(GLchar* name) {
-        GLint result;
         for (size_t i = 0; i < locations.size(); i++) {
-            Uniform u = locations[i];
-            if (u.name == name) {
-                result = u.location;
-                break;
+            if (strcmp(locations[i].name, name) == 0) {
+                return locations[i].location;
             }
         }
 
-        return result;
+        return -1;
     }
 
     GLuint getTex(std::string path) {
@@ -185,7 +182,7 @@ public:
 
     void setUniform(GLchar* name, float inp) {
         GLint l = checkSaved(name);
-        if (!l) {
+        if (l == -1) {
             GLint location = glGetUniformLocation(program, name);
             cache(name, location);
             l = location;
@@ -195,7 +192,7 @@ public:
 
     void setUniform(GLchar* name, vec2 inp) {
         GLint l = checkSaved(name);
-        if (!l) {
+        if (l == -1) {
             GLint location = glGetUniformLocation(program, name);
             cache(name, location);
             l = location;
@@ -205,7 +202,7 @@ public:
 
     void setUniform(GLchar* name, vec3 inp) {
         GLint l = checkSaved(name);
-        if (!l) {
+        if (l == -1) {
             GLint location = glGetUniformLocation(program, name);
             cache(name, location);
             l = location;
@@ -215,7 +212,7 @@ public:
 
     void setUniform(GLchar* name, vec4 inp) {
         GLint l = checkSaved(name);
-        if (!l) {
+        if (l == -1) {
             GLint location = glGetUniformLocation(program, name);
             cache(name, location);
             l = location;
@@ -225,7 +222,7 @@ public:
 
     void setUniform(GLchar* name, int inp) {
         GLint l = checkSaved(name);
-        if (!l) {
+        if (l == -1) {
             GLint location = glGetUniformLocation(program, name);
             cache(name, location);
             l = location;
@@ -235,7 +232,7 @@ public:
 
     void setUniform(GLchar* name, std::string inp) {
         GLint l = checkSaved(name);
-        if (!l) {
+        if (l == -1) {
             GLint location = glGetUniformLocation(program, name);
             cache(name, location);
             l = location;

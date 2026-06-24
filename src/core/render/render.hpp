@@ -14,10 +14,11 @@
 
 
 struct Vertex {
-    vec2 position;
+    vec3 position;
     vec4 color;
     vec2 uv;
 };
+
 
 struct Tri {
     Vertex v1;
@@ -35,8 +36,6 @@ class Render {
 private:
     GLuint vao;
     GLuint vbo;
-
-    Shader shader;
 
     std::vector<Vertex> vertices;
     std::vector<Model> models;
@@ -64,6 +63,8 @@ private:
     }
 
 public:
+    Shader shader;
+
     vec4 clear;
 
     Render() {
@@ -80,7 +81,7 @@ public:
 
         glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
         glEnableVertexAttribArray(0);
 
         glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
@@ -112,12 +113,28 @@ public:
     }
 
     void drawTri(vec2 a, vec2 b, vec2 c, vec4 color) {
+        vertices.push_back({vec3(a, 0.0), color, vec2(0.0)});
+        vertices.push_back({vec3(b, 0.0), color, vec2(0.0, 1.0)});
+        vertices.push_back({vec3(c, 0.0), color, vec2(1.0)});
+    }
+
+    void drawTri(vec3 a, vec3 b, vec3 c, vec4 color) {
         vertices.push_back({a, color, vec2(0.0)});
         vertices.push_back({b, color, vec2(0.0, 1.0)});
         vertices.push_back({c, color, vec2(1.0)});
     }
 
     void drawQuad(vec2 a, vec2 b, vec2 c, vec2 d, vec4 color) {
+        vertices.push_back({vec3(a, 0.0), color, vec2(0.0)});
+        vertices.push_back({vec3(b, 0.0), color, vec2(0.0, 1.0)});
+        vertices.push_back({vec3(c, 0.0), color, vec2(1.0)});
+
+        vertices.push_back({vec3(a, 0.0), color, vec2(0.0)});
+        vertices.push_back({vec3(d, 0.0), color, vec2(1.0, 0.0)});
+        vertices.push_back({vec3(c, 0.0), color, vec2(1.0)});
+    }
+
+    void drawQuad(vec3 a, vec3 b, vec3 c, vec3 d, vec4 color) {
         vertices.push_back({a, color, vec2(0.0)});
         vertices.push_back({b, color, vec2(0.0, 1.0)});
         vertices.push_back({c, color, vec2(1.0)});
@@ -135,7 +152,20 @@ public:
         drawQuad(a, b, c, d, color);
     }
 
+    void drawRect(vec3 pos, vec2 size, vec4 color) {
+        vec3 a = pos - vec3(size, 0.0);
+        vec3 b = pos - vec3(size.x, -size.y, 0.0);
+        vec3 c = pos + vec3(size, 0.0);
+        vec3 d = pos + vec3(size.x, -size.y, 0.0);
+        drawQuad(a, b, c, d, color);
+    }
+
     void drawLine(vec2 start, vec2 end, vec4 color) {
+        vertices.push_back({vec3(start, 0.0), color, vec2(0.0)});
+        vertices.push_back({vec3(end, 0.0), color, vec2(1.0)});
+    }
+
+    void drawLine(vec3 start, vec3 end, vec4 color) {
         vertices.push_back({start, color, vec2(0.0)});
         vertices.push_back({end, color, vec2(1.0)});
     }

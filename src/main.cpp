@@ -4,8 +4,10 @@
 
 #include "core/render/window.hpp"
 #include "core/render/render.hpp"
+#include "core/render/camera.hpp"
 
 #include "core/math/essentials.hpp"
+
 #include "engine/mobs/player.hpp"
 
 int main() {
@@ -14,9 +16,14 @@ int main() {
     render.init();
 
     Player player;
-    player.pos = vec2(0.0);
-    player.vel = vec2(0.0);
+    player.pos = vec3(0.0, 0.05, 0.0);
+    player.vel = vec3(0.0);
     player.speed = 0.001;
+
+    Camera camera;
+    camera.pos = vec3(0.0, 0.0, -1.0);
+
+    float av = 0.0;
 
     float aspect = 1280.0/720.0;
     int tick = 0;
@@ -25,19 +32,33 @@ int main() {
         w.pollEvents();
         render.beginFrame();
 
+        render.shader.setUniform((GLchar*)"cam", camera.pos);
+        render.shader.setUniform((GLchar*)"rot", camera.rot);
+        render.shader.setUniform((GLchar*)"f", camera.focal);
+
         tick += 1;
 
         if (tick % 5 == 0) {
-            player.checkMovement(w);
+            player.checkMovement(w, camera);
+
+            if (w.isKeyPressed("e")) {
+                av += 0.1;
+            }
+            if (w.isKeyPressed("q")) {
+                av -= 0.1;
+            }
+
+            av *= 0.9;
+            camera.rot.x = camera.rot.x + av;
         }
 
-        render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(vec3(0.0), 1.0));
+        camera.follow(player.pos, 0.01);
 
-        vec2 p = floor(w.mouse * 16.0) / 16.0;
+        render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(1.0, 0.0, 0.0, 1.0));
+        render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0, 206.0, 235.0, 1.0));
 
-        render.drawRect(w.mouse, vec2(0.0125 / aspect, 0.0125), vec4(vec3(0.0), 1.0));
-
-        render.drawRect(vec2(0, .8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0, 206.0, 235.0, 1.0));
+        render.drawQuad(vec3(-0.5, 0.0, 0.0), vec3(-0.5, 0.0, 1.0), vec3(0.5, 0.0, 1.0), vec3(0.5, 0.0, 0.0), vec4(1.0));
+        
 
         if (w.isKeyPressed("esc")) {
             break;
