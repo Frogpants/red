@@ -2,6 +2,7 @@
 
 #include "../../core/math/essentials.hpp"
 #include "../../core/render/render.hpp"
+#include "../../core/render/camera.hpp"
 
 inline float tileXC = 0.0;
 inline float tileYC = 0.0;
@@ -15,8 +16,8 @@ struct Tile {
     int index;
     float lightLevel = 0.0;
 
-    void update(Render& r, vec3 cam, float WIDTH, std::vector<int> world) {
-        vec3 temp = pos - cam;
+    void update(Render& r, Camera cam, float WIDTH, std::vector<int> world) {
+        vec3 temp = pos - cam.pos;
         if (abs(temp.x) > tileXC * (tileXS / 2.0)) {
             if (temp.x < 0.0) {
                 pos.x += tileXC * tileXS;
