@@ -25,8 +25,8 @@ struct Texture {
 
 class Shader {
 private:
-    std::string vert = "src/core/render/shaders/vert.glsl";
-    std::string frag = "src/core/render/shaders/frag.glsl";
+    std::string vert = "src/core/render/shaders/test/vert.glsl";
+    std::string frag = "src/core/render/shaders/test/frag.glsl";
 
     std::string vertCode;
     std::string fragCode;
