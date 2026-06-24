@@ -1,6 +1,7 @@
 #pragma once
 
-#include <ifstream>
+#include <fstream>
+#include <sstream>
 #include <vector>
 
 #include <GL/glew.h>
@@ -8,7 +9,7 @@
 
 #include "../math/essentials.hpp"
 
-struct Vertex {
+struct Vert {
     vec3 position;
     vec4 color;
     vec2 uv;
@@ -28,7 +29,7 @@ public:
         vertexCount = 0;
     }
 
-    void upload(std::vector<Vertex>& vertices) {
+    void upload(std::vector<Vert>& vertices) {
         vertexCount = vertices.size();
 
         glGenVertexArrays(1, &vao);
@@ -38,18 +39,18 @@ public:
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vert), vertices.data(), GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, color));
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, uv));
         glEnableVertexAttribArray(2);
 
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, normal));
         glEnableVertexAttribArray(3);
 
         glBindVertexArray(0);
@@ -71,7 +72,7 @@ inline Mesh LoadOBJ(const std::string& path)
     std::vector<vec2> uvs;
     std::vector<vec3> normals;
 
-    std::vector<Vertex> vertices;
+    std::vector<Vert> vertices;
 
     std::string line;
 
@@ -115,8 +116,7 @@ inline Mesh LoadOBJ(const std::string& path)
                 int uv = std::stoi(uvStr) - 1;
                 int n = std::stoi(nStr) - 1;
 
-                Vertex v;
-
+                Vert v;
                 v.position = positions[p];
                 v.uv = uvs[uv];
                 v.normal = normals[n];

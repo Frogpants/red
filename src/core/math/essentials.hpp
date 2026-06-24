@@ -691,9 +691,17 @@ inline vec2 sin(vec2 v) {
     return vec2(sin(v.x), sin(v.y));
 }
 
+inline vec3 sin(vec3 v) {
+    return vec3(sin(v.x), sin(v.y), sin(v.z));
+}
+
 // inline float cos(float x) {
 //     return std::cos(x);
 // }
+
+inline vec3 cos(vec3 v) {
+    return vec3(cos(v.x), cos(v.y), cos(v.z));
+}
 
 // inline float tan(float x) {
 //     return std::tan(x);
