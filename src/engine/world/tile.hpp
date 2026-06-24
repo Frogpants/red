@@ -1,14 +1,42 @@
 #pragma once
 
-#include "../core/math/essentials.hpp"
+#include "../../core/math/essentials.hpp"
+#include "../../core/render/render.hpp"
+
+inline float tileXC = 0.0;
+inline float tileYC = 0.0;
+
+inline float tileXS = 0.0;
+inline float tileYS = 0.0;
 
 struct Tile {
-    vec2 pos;
+    vec3 pos;
 
     int index;
+    float lightLevel = 0.0;
 
-    void update() {
-        vec2 diff = pos - cam;
-        if (abs())
+    void update(Render& r, vec3 cam, float WIDTH, std::vector<int> world) {
+        vec3 temp = pos - cam;
+        if (abs(temp.x) > tileXC * (tileXS / 2.0)) {
+            if (temp.x < 0.0) {
+                pos.x += tileXC * tileXS;
+                index += tileXC;
+            } else {
+                pos.x -= tileXC * tileXS;
+                index -= tileXC;
+            }
+        }
+
+        if (abs(temp.y) > tileYC * (tileYS / 2.0)) {
+            if (temp.y < 0.0) {
+                pos.y += tileYC * tileYS;
+                index += tileXC * WIDTH;
+            } else {
+                pos.y -= tileXC * tileYS;
+                index -= tileXC * WIDTH;
+            }
+        }
+
+        r.drawMesh(world[index]);
     }
 };

@@ -145,4 +145,15 @@ public:
         mesh.draw();
     }
 
+    void drawMesh(int c) {
+        shader.bind();
+        models[c].mesh.draw();
+    }
+
+    void drawMesh(std::string c) {
+        shader.bind();
+        Mesh m = checkModel(c);
+        m.draw();
+    }
+
 };
