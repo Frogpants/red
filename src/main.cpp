@@ -16,12 +16,13 @@ int main() {
     render.init();
 
     Player player;
-    player.pos = vec3(0.0, -0.05, 0.0);
+    player.pos = vec3(0.0, 0.0, 0.0);
     player.vel = vec3(0.0);
     player.speed = 0.001;
 
     Camera camera;
     camera.pos = vec3(0.0, 0.0, 0.0);
+    //camera.rot = vec3(0.0);
 
     float av = 0.0;
 
@@ -49,24 +50,26 @@ int main() {
             }
 
             if (w.isKeyPressed("x")) {
-                camera.FOV -= 1;
+                camera.FOV -= 2;
             }
             if (w.isKeyPressed("z")) {
-                camera.FOV += 1;
+                camera.FOV += 2;
             }
             camera.focal = 1.0 / atan(radians(camera.FOV / 2.0));
 
             av *= 0.9;
             camera.rot.x = camera.rot.x + av;
+
+            // camera.rot = vec3(w.mouse * 0.3, 0.0);
         }
 
         camera.follow(player.pos, 0.01);
 
         
-        render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0, 206.0, 235.0, 1.0));
-
-        render.drawQuad(vec3(-0.5, 0.0, -0.5), vec3(-0.5, 0.0, 0.5), vec3(0.5, 0.0, 0.5), vec3(0.5, 0.0, -0.5), vec4(34.0/255.0, 139.0/255.0, 34.0/255.0, 1.0));
+        render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
         render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(1.0, 0.0, 0.0, 1.0));
+        render.drawQuad(vec3(-0.5, 0.0, -0.5), vec3(-0.5, 0.0, 0.5), vec3(0.5, 0.0, 0.5), vec3(0.5, 0.0, -0.5), vec4(0.416, 0.745, 0.188, 1.0));
+        
 
         if (w.isKeyPressed("esc")) {
             break;

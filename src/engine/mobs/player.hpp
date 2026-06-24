@@ -30,17 +30,17 @@ struct Player {
         }
 
         if (w.isKeyPressed("w")) {
-            move(c, mult, dir + 90.0);
+            move(c, mult, dir);
         }
         if (w.isKeyPressed("s")) {
-            move(c, -mult, dir + 90.0);
+            move(c, -mult, dir);
         }
 
         if (w.isKeyPressed("d")) {
-            move(c, mult * 0.5, dir);
+            move(c, mult * 0.5, dir + 90.0);
         }
         if (w.isKeyPressed("a")) {
-            move(c, -mult * 0.5, dir);
+            move(c, -mult * 0.5, dir + 90.0);
         }
 
         vel = vel * 0.9;
@@ -48,7 +48,7 @@ struct Player {
     }
 
     void move(Camera& c, float mult, float d) {
-        float angle = d - c.rot.x;
+        float angle = c.rot.x - d;
         vel.x = vel.x - mult * speed * sin(radians(angle));
         vel.z = vel.z - mult * speed * cos(radians(angle));
     }
