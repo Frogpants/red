@@ -8,15 +8,17 @@
 #include "core/math/essentials.hpp"
 #include "engine/mobs/player.hpp"
 
-Player player(0.001, 100);
-
 int main() {
     Window w = Window(1280, 720, "Red Noise");
     Render render;
     render.init();
 
-    float aspect = 1280.0/720.0;
+    Player player;
+    player.pos = vec2(0.0);
+    player.vel = vec2(0.0);
+    player.speed = 0.001;
 
+    float aspect = 1280.0/720.0;
     int tick = 0;
 
     while (w.isOpen()) {
