@@ -35,7 +35,7 @@ vec3 project() {
     p.x = tx * cos(trig.z) - ty * sin(trig.z);
     p.y = tx * sin(trig.z) + ty * cos(trig.z);
 
-    p.z = max(p.z, 0.1);
+    // p.z = max(p.z, 0.1);
 
     return vec3(p.xy * f, p.z);
 }
