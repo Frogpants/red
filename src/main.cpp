@@ -65,7 +65,7 @@ int main() {
         
         render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0, 206.0, 235.0, 1.0));
 
-        render.drawQuad(vec3(-0.5, 0.0, -0.5), vec3(-0.5, 0.0, 0.5), vec3(0.5, 0.0, 0.5), vec3(0.5, 0.0, -0.5), vec4(1.0));
+        render.drawQuad(vec3(-0.5, 0.0, -0.5), vec3(-0.5, 0.0, 0.5), vec3(0.5, 0.0, 0.5), vec3(0.5, 0.0, -0.5), vec4(34.0/255.0, 139.0/255.0, 34.0/255.0, 1.0));
         render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(1.0, 0.0, 0.0, 1.0));
 
         if (w.isKeyPressed("esc")) {

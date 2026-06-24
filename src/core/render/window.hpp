@@ -108,6 +108,8 @@ public:
         window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         glfwMakeContextCurrent(window);
 
+        glfwSwapInterval(1);
+
         glewExperimental = GL_TRUE;
         glewInit();
         glViewport(0, 0, width, height);
