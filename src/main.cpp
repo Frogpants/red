@@ -16,7 +16,7 @@ int main() {
     render.init();
 
     Player player;
-    player.pos = vec3(0.0, 0.0, 0.0);
+    player.pos = vec3(0.0, -0.05, 0.0);
     player.vel = vec3(0.0);
     player.speed = 0.001;
 
