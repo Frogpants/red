@@ -28,15 +28,6 @@ int main() {
         tick += 1;
 
         if (tick % 5 == 0) {
-
-            if (player.stamina < 0.0) {
-                player.stamina = 0.0;
-            } else if (player.stamina > 100.0) {
-                player.stamina = 100.0;
-            } else {
-                player.stamina += .025;
-            }
-
             player.checkMovement(w);
         }
 
