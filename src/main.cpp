@@ -23,11 +23,19 @@ int main() {
     player.vel = vec3(0.0);
     player.speed = 0.001;
 
+
     Camera camera;
     camera.pos = vec3(0.0);
-    //camera.rot = vec3(0.0);
+
+
+    World world;
+    world.tileC = vec2(10.0);
+    world.tileS = vec2(0.2);
+    world.create(100.0, 100.0);
+
 
     vec2 start = vec2(0.0);
+
 
     float av = 0.0;
 
@@ -80,12 +88,17 @@ int main() {
 
         }
 
+        player.vel = player.vel * 0.9;
+        player.pos = player.pos + player.vel;
+
         camera.follow(player.pos, 0.01);
+
+
+        world.render(render, camera);
 
         
         render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
         render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(1.0, 0.0, 0.0, 1.0));
-        render.drawQuad(vec3(-0.5, 0.0, -0.5), vec3(-0.5, 0.0, 0.5), vec3(0.5, 0.0, 0.5), vec3(0.5, 0.0, -0.5), vec4(0.416, 0.745, 0.188, 1.0));
         
 
         if (w.isKeyPressed("esc")) {

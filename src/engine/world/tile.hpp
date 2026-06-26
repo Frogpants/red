@@ -4,11 +4,6 @@
 #include "../../core/render/render.hpp"
 #include "../../core/render/camera.hpp"
 
-inline float tileXC = 0.0;
-inline float tileYC = 0.0;
-
-inline float tileXS = 0.0;
-inline float tileYS = 0.0;
 
 struct Tile {
     vec3 pos;
@@ -16,25 +11,28 @@ struct Tile {
     int index;
     float lightLevel = 0.0;
 
-    void update(Render& r, Camera cam, float WIDTH, std::vector<int> world) {
+    vec2 tileC;
+    vec2 tileS;
+
+    void update(Render& r, Camera& cam, float WIDTH, std::vector<int>& world) {
         vec3 temp = pos - cam.pos;
-        if (abs(temp.x) > tileXC * (tileXS / 2.0)) {
+        if (abs(temp.x) > tileC.x * (tileS.x / 2.0)) {
             if (temp.x < 0.0) {
-                pos.x += tileXC * tileXS;
-                index += tileXC;
+                pos.x += tileC.x * tileS.x;
+                index += tileC.x;
             } else {
-                pos.x -= tileXC * tileXS;
-                index -= tileXC;
+                pos.x -= tileC.x * tileS.x;
+                index -= tileC.x;
             }
         }
 
-        if (abs(temp.y) > tileYC * (tileYS / 2.0)) {
-            if (temp.y < 0.0) {
-                pos.y += tileYC * tileYS;
-                index += tileXC * WIDTH;
+        if (abs(temp.z) > tileC.y * (tileS.y / 2.0)) {
+            if (temp.z < 0.0) {
+                pos.z += tileC.y * tileS.y;
+                index += tileC.y * WIDTH;
             } else {
-                pos.y -= tileXC * tileYS;
-                index -= tileXC * WIDTH;
+                pos.z -= tileC.y * tileS.y;
+                index -= tileC.y * WIDTH;
             }
         }
 

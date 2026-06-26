@@ -69,7 +69,7 @@ public:
 
     Render() {
         clear = vec4(vec3(0.0), 1.0);
-        MAX_VERTICES = 300;
+        MAX_VERTICES = 300000;
     }
     
     void init() {

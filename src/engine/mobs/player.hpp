@@ -2,8 +2,10 @@
 
 
 #include "../../core/math/essentials.hpp"
+
 #include "../../core/render/window.hpp"
 #include "../../core/render/camera.hpp"
+#include "../../core/render/render.hpp"
 
 struct Player {
     float speed;
@@ -42,9 +44,6 @@ struct Player {
         if (w.isKeyPressed("a")) {
             move(c, -mult * 0.5, dir + 90.0);
         }
-
-        vel = vel * 0.9;
-        pos = pos + vel;
     }
 
     void move(Camera& c, float mult, float d) {

@@ -27,16 +27,16 @@ struct World {
 
         size = vec2(width, height);
         for (int i = 0; i < width * height; i++) {
-            float type = noise.randInt(0, 1);
-            world.push_back((int)type);
+            int type = noise.randInt(0, 1);
+            world.push_back(type);
             lighting.push_back(0.0);
         }
 
-        int index = 1;
+        int index = 0;
         vec2 p = vec2(0.0, tileS.y/2.0);
-        for (int y = 0; y < tileC.y; y++) {
-            p.x = tileS.x/20;
-            for (int x = 0; x < tileC.x; x++) {
+        for (int y = 0; y < (int)tileC.y; y++) {
+            p.x = tileS.x/2.0;
+            for (int x = 0; x < (int)tileC.x; x++) {
                 addTile(vec3(p.x, 0.0, p.y), index);
                 p.x += tileS.x;
                 index += 1;
@@ -54,10 +54,11 @@ struct World {
         tiles.push_back(tile);
     }
 
-    void render(Render& r, Camera c) {
-        Tile t;
-        for (size_t i = 0; i < tiles.size(); i++) {
-            tiles[i].update(r, c, size.x, world);
+    void render(Render& r, Camera& c) {
+        for (Tile& tile : tiles) {
+            tile.tileC = tileC;
+            tile.tileS = tileS;
+            tile.update(r, c, size.x, world);
         }
     }
 

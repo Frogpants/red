@@ -6,18 +6,16 @@
 #include "essentials.hpp"
 
 struct Noise {
-    float seed;
-
+    inline static std::mt19937 gen{std::random_device{}()};
+    
     float rand() {
-        std::random_device rd; 
-        std::mt19937 gen(rd()); 
-        std::uniform_int_distribution<float> distrib(0.0, 1.0); 
-        float num = distrib(gen);
-        return num;
+        static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+        return dis(gen);
     }
 
-    float randInt(int a, int b) {
-        return floor((float)a + (float)(b - a) * rand());
+    int randInt(int a, int b) {
+        std::uniform_int_distribution<int> dis(a, b);
+        return dis(gen);
     }
 
     vec2 random2(vec2 st){
