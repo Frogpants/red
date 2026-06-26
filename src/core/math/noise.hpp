@@ -1,9 +1,24 @@
 #pragma once
 
+#include <iostream>
+#include <random>
+
 #include "essentials.hpp"
 
-class Noise {
+struct Noise {
     float seed;
+
+    float rand() {
+        std::random_device rd; 
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<float> distrib(0.0, 1.0); 
+        float num = distrib(gen);
+        return num;
+    }
+
+    float randInt(int a, int b) {
+        return floor((float)a + (float)(b - a) * rand());
+    }
 
     vec2 random2(vec2 st){
         st = vec2( dot(st,vec2(127.1,311.7)), dot(st,vec2(269.5,183.3)) );

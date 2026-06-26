@@ -38,6 +38,14 @@ struct Tile {
             }
         }
 
-        r.drawMesh(world[index]);
+        // r.drawMesh(world[index]);
+
+        if (world[index] == 1) {
+            vec3 a = pos + vec3(-0.1, 0.0, -0.1);
+            vec3 b = pos + vec3(-0.1, 0.0, 0.1);
+            vec3 c = pos + vec3(0.1, 0.0, 0.1);
+            vec3 d = pos + vec3(0.1, 0.0, -0.1);
+            r.drawQuad(a, b, c, d, vec4(0.416, 0.745, 0.188, 1.0));
+        }
     }
 };
