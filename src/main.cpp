@@ -19,7 +19,7 @@ int main() {
 
 
     Player player;
-    player.pos = vec3(0.0, -0.05, 0.0);
+    player.pos = vec3(0.0, 0.05, 0.0);
     player.vel = vec3(0.0);
     player.speed = 0.001;
 
@@ -30,7 +30,7 @@ int main() {
 
     World world;
     world.tileC = vec2(10.0);
-    world.tileS = vec2(0.2);
+    world.tileS = vec2(0.1);
     world.create(100.0, 100.0);
 
 

@@ -37,7 +37,7 @@ vec3 project() {
 
     // p.z = max(p.z, 0.1);
 
-    return vec3(p.xy * f, p.z);
+    return vec3(p.xy * f, -p.z);
 }
 
 void main()
