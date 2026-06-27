@@ -7,15 +7,12 @@ out vec4 FragColor;
 
 void main()
 {
-    vec2 resolution = vec2(256.0);
-
-    // size of one pixel in UV space
+    vec2 resolution = vec2(512.0);
     vec2 pixelSize = 1.0 / resolution;
 
-    // base pixel cell
     vec2 cell = floor(TexCoord * resolution) / resolution;
+    float aaStrength = 1.0;
 
-    // jitter offsets inside the pixel cell
     vec2 offsets[4];
     offsets[0] = vec2(0.25, 0.25);
     offsets[1] = vec2(0.75, 0.25);
@@ -27,6 +24,7 @@ void main()
     for (int i = 0; i < 4; i++)
     {
         vec2 uv = cell + offsets[i] * pixelSize;
+        uv = mix(cell, uv, aaStrength);
         col += texture(screenTex, uv);
     }
 
@@ -34,9 +32,6 @@ void main()
 
     float alpha = col.a;
     vec3 color = col.rgb;
-
-    // color = floor(color * 16.0) / 16.0;
-    // color *= vec3(1.0, 0.8, 0.9);
 
     FragColor = vec4(color, alpha);
 }

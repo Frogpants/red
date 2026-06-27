@@ -3,11 +3,15 @@
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 color;
 layout(location = 2) in vec2 uv;
+layout(location = 3) in vec3 normal;
+
 
 uniform vec3 cam;
 uniform vec3 rot;
 uniform float f;
 
+
+out vec3 vNormal;
 out vec4 vertexColor;
 out vec2 vUV;
 
@@ -47,6 +51,7 @@ void main()
     gl_Position = vec4(project(), 1.0);
 
     vertexColor = color;
+    vNormal = normal;
 
     vUV = uv;
 }

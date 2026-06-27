@@ -1,7 +1,14 @@
 #version 330 core
 
+uniform sampler2D tex;
+
+uniform vec3 lightDir;
+uniform vec3 lightColor;
+uniform vec3 ambient;
+
 in vec4 vertexColor;
 in vec2 vUV;
+in vec3 vNormal;
 
 out vec4 FragColor;
 
@@ -25,8 +32,16 @@ float noise(vec2 st) {
 void main()
 {
     vec2 uv = vUV;
-    vec2 st = floor(uv * 16.0) / 16.0;
-    vec3 col = vec3(noise(uv * 20.0) * 0.5 + 0.5);
+    vec4 t = texture(tex, uv);
 
-    FragColor = vec4(col, 1.0) * vertexColor;
+    vec3 N = normalize(vNormal);
+    vec3 L = normalize(lightDir);
+
+    float diff = max(dot(N, L), 0.0);
+    vec3 lighting = ambient + diff * lightColor;
+    lighting = clamp(lighting, 0.0, 1.0);
+
+    vec3 col = vertexColor.rgb * lighting;
+
+    FragColor = vec4(col, t.a);
 }

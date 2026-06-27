@@ -18,6 +18,7 @@ struct Vertex {
     vec3 position;
     vec4 color;
     vec2 uv;
+    vec3 normal;
 };
 
 
@@ -68,6 +69,10 @@ private:
         models.push_back(m);
     }
 
+    vec3 findNormal(vec3 a, vec3 b, vec3 c) {
+        return normalize(cross(b - a, c - a));
+    }
+
 public:
     vec4 clear;
 
@@ -93,6 +98,9 @@ public:
 
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
         glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+        glEnableVertexAttribArray(3);
 
 
         glGenVertexArrays(1, &quadVAO);
@@ -159,7 +167,7 @@ public:
 
         activeShader->bind();
 
-        activeShader->setTexture((GLchar*)"screenTex", src.texture);
+        activeShader->setTexture("screenTex", src.texture);
 
         drawQuad(vec2(-1.0f, -1.0f), vec2(-1.0f,  1.0f), vec2( 1.0f,  1.0f), vec2( 1.0f, -1.0f), vec4(1.0f));
     }
@@ -174,42 +182,53 @@ public:
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, src.texture);
-        src.postShader.setUniform((GLchar*)"screenTex", 0);
+        src.postShader.setUniform("screenTex", 0);
 
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     void drawTri(vec2 a, vec2 b, vec2 c, vec4 color) {
-        vertices.push_back({vec3(a, 0.0), color, vec2(0.0)});
-        vertices.push_back({vec3(b, 0.0), color, vec2(0.0, 1.0)});
-        vertices.push_back({vec3(c, 0.0), color, vec2(1.0)});
+        vec3 v1 = vec3(a, 0.0);
+        vec3 v2 = vec3(b, 0.0);
+        vec3 v3 = vec3(c, 0.0);
+        vec3 n = findNormal(v1, v2, v3);
+        vertices.push_back({v1, color, vec2(0.0), n});
+        vertices.push_back({v2, color, vec2(0.0, 1.0), n});
+        vertices.push_back({v3, color, vec2(1.0), n});
     }
 
     void drawTri(vec3 a, vec3 b, vec3 c, vec4 color) {
-        vertices.push_back({a, color, vec2(0.0)});
-        vertices.push_back({b, color, vec2(0.0, 1.0)});
-        vertices.push_back({c, color, vec2(1.0)});
+        vec3 n = findNormal(a, b, c);
+        vertices.push_back({a, color, vec2(0.0), n});
+        vertices.push_back({b, color, vec2(0.0, 1.0), n});
+        vertices.push_back({c, color, vec2(1.0), n});
     }
 
     void drawQuad(vec2 a, vec2 b, vec2 c, vec2 d, vec4 color) {
-        vertices.push_back({vec3(a, 0.0), color, vec2(0.0)});
-        vertices.push_back({vec3(b, 0.0), color, vec2(0.0, 1.0)});
-        vertices.push_back({vec3(c, 0.0), color, vec2(1.0)});
+        vec3 v1 = vec3(a, 0.0);
+        vec3 v2 = vec3(b, 0.0);
+        vec3 v3 = vec3(c, 0.0);
+        vec3 v4 = vec3(d, 0.0);
+        vec3 n = findNormal(v1, v2, v3);
+        vertices.push_back({v1, color, vec2(0.0), n});
+        vertices.push_back({v2, color, vec2(0.0, 1.0), n});
+        vertices.push_back({v3, color, vec2(1.0), n});
 
-        vertices.push_back({vec3(a, 0.0), color, vec2(0.0)});
-        vertices.push_back({vec3(d, 0.0), color, vec2(1.0, 0.0)});
-        vertices.push_back({vec3(c, 0.0), color, vec2(1.0)});
+        vertices.push_back({v1, color, vec2(0.0), n});
+        vertices.push_back({v4, color, vec2(1.0, 0.0), n});
+        vertices.push_back({v3, color, vec2(1.0), n});
     }
 
     void drawQuad(vec3 a, vec3 b, vec3 c, vec3 d, vec4 color) {
-        vertices.push_back({a, color, vec2(0.0)});
-        vertices.push_back({b, color, vec2(0.0, 1.0)});
-        vertices.push_back({c, color, vec2(1.0)});
+        vec3 n = findNormal(a, b, c);
+        vertices.push_back({a, color, vec2(0.0), n});
+        vertices.push_back({b, color, vec2(0.0, 1.0), n});
+        vertices.push_back({c, color, vec2(1.0), n});
 
-        vertices.push_back({a, color, vec2(0.0)});
-        vertices.push_back({d, color, vec2(1.0, 0.0)});
-        vertices.push_back({c, color, vec2(1.0)});
+        vertices.push_back({a, color, vec2(0.0), n});
+        vertices.push_back({d, color, vec2(1.0, 0.0), n});
+        vertices.push_back({c, color, vec2(1.0), n});
     }
 
     void drawRect(vec2 pos, vec2 size, vec4 color) {

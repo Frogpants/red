@@ -36,7 +36,6 @@ private:
 
     GLuint program;
 
-    std::vector<Texture> textures;
     std::vector<Uniform> locations;
 
     std::string openFile(std::string path) {
@@ -131,6 +130,7 @@ private:
 
 
 public:
+    std::vector<Texture> textures;
 
     void load() {
         vertShader = glCreateShader(GL_VERTEX_SHADER);
@@ -203,50 +203,60 @@ public:
     }
 
     void setUniform(GLchar* name, float inp) {
-        GLint l = checkSaved(name);
+        GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
-            GLint location = glGetUniformLocation(program, name);
-            cache(name, location);
+            GLint location = glGetUniformLocation(program, (GLchar*)name);
+            cache((GLchar*)name, location);
             l = location;
         }
         glUniform1f(l, inp);
     }
 
-    void setUniform(GLchar* name, vec2 inp) {
-        GLint l = checkSaved(name);
+    void setUniform(GLchar* name, double inp) {
+        GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
-            GLint location = glGetUniformLocation(program, name);
-            cache(name, location);
+            GLint location = glGetUniformLocation(program, (GLchar*)name);
+            cache((GLchar*)name, location);
+            l = location;
+        }
+        glUniform1f(l, (float)inp);
+    }
+
+    void setUniform(GLchar* name, vec2 inp) {
+        GLint l = checkSaved((GLchar*)name);
+        if (l == -1) {
+            GLint location = glGetUniformLocation(program, (GLchar*)name);
+            cache((GLchar*)name, location);
             l = location;
         }
         glUniform2f(l, inp.x, inp.y);
     }
 
     void setUniform(GLchar* name, vec3 inp) {
-        GLint l = checkSaved(name);
+        GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
-            GLint location = glGetUniformLocation(program, name);
-            cache(name, location);
+            GLint location = glGetUniformLocation(program, (GLchar*)name);
+            cache((GLchar*)name, location);
             l = location;
         }
         glUniform3f(l, inp.x, inp.y, inp.z);
     }
 
     void setUniform(GLchar* name, vec4 inp) {
-        GLint l = checkSaved(name);
+        GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
-            GLint location = glGetUniformLocation(program, name);
-            cache(name, location);
+            GLint location = glGetUniformLocation(program, (GLchar*)name);
+            cache((GLchar*)name, location);
             l = location;
         }
         glUniform4f(l, inp.x, inp.y, inp.z, inp.w);
     }
 
     void setUniform(GLchar* name, int inp) {
-        GLint l = checkSaved(name);
+        GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
-            GLint location = glGetUniformLocation(program, name);
-            cache(name, location);
+            GLint location = glGetUniformLocation(program, (GLchar*)name);
+            cache((GLchar*)name, location);
             l = location;
         }
         glUniform1i(l, inp);

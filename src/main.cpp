@@ -41,6 +41,9 @@ int main() {
     RenderTexture scene;
     scene.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
 
+    scene.triShader.addTex("src/assets/textures/null.png");
+    Texture missing = scene.triShader.textures[0];
+
     RenderTexture post;
     post.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
 
@@ -61,9 +64,16 @@ int main() {
         render.beginFrame(scene);
 
         scene.triShader.bind();
-        scene.triShader.setUniform((GLchar*)"cam", camera.pos);
-        scene.triShader.setUniform((GLchar*)"rot", camera.rot);
-        scene.triShader.setUniform((GLchar*)"f", camera.focal);
+        scene.triShader.setUniform("cam", camera.pos);
+        scene.triShader.setUniform("rot", camera.rot);
+        scene.triShader.setUniform("f", camera.focal);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, missing.texture);
+        scene.triShader.setUniform("tex", 1);
+
+        scene.triShader.setUniform("lightDir", normalize(camera.rot));
+        scene.triShader.setUniform("lightColor", vec3(1.0));
+        scene.triShader.setUniform("ambient", 1.0);
 
         tick += 1;
 
@@ -106,25 +116,14 @@ int main() {
         player.vel = player.vel * 0.9;
         player.pos = player.pos + player.vel;
 
-        camera.follow(player.pos, 0.01);
+        camera.follow(player.pos, 0.05);
 
 
         world.render(render, camera);
 
         
-        render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
+        // render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
         render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(1.0, 0.0, 0.0, 1.0));
-        
-
-        vec3 a = vec3(-world.tileS.x, 0.0, -world.tileS.y) * 0.5;
-        vec3 b = vec3(-world.tileS.x, 0.0, world.tileS.y) * 0.5;
-        vec3 c = vec3(world.tileS.x, 0.0, world.tileS.y) * 0.5;
-
-        if (rayTriangle(mRay, a, b, c, t)) {
-            render.drawTri(a, b, c, vec4(1.0, 1.0, 1.0, 1.0));
-        } else {
-            render.drawTri(a, b, c, vec4(0.5, 0.5, 0.5, 1.0));
-        }
 
         if (w.isKeyPressed("r")) {
             camera.rot = vec3(0.0);

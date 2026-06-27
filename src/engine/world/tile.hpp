@@ -45,7 +45,7 @@ struct Tile {
             vec3 d = pos + vec3(tileS.x, 0.0, -tileS.y) * 0.5;
             r.drawQuad(a, b, c, d, vec4(0.416, 0.745, 0.188, 1.0));
         } else {
-            r.drawLine(pos, pos + vec3(0.0, tileS.x / 1.5, 0.0), vec4(0.5, 0.5, 1.0, 1.0));
+            // r.drawLine(pos, pos + vec3(0.0, tileS.x / 1.5, 0.0), vec4(0.5, 0.5, 1.0, 1.0));
         }
     }
 };
