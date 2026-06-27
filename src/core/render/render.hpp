@@ -187,8 +187,7 @@ public:
     }
 
     void drawLine(vec3 start, vec3 end, vec4 color) {
-        vertices.push_back({start, color, vec2(0.0)});
-        vertices.push_back({end, color, vec2(1.0)});
+        drawQuad(start + vec3(-0.001, 0.0, 0.0), start + vec3(0.001, 0.0, 0.0), end + vec3(0.001, 0.0, 0.0), end + vec3(-0.001, 0.0, 0.0), color);
     }
 
     void drawMesh(Mesh& mesh) {
@@ -206,5 +205,4 @@ public:
         Mesh m = checkModel(c);
         m.draw();
     }
-
 };

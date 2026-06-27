@@ -7,10 +7,13 @@
 #include "core/render/camera.hpp"
 
 #include "core/math/essentials.hpp"
+#include "core/math/ray.hpp"
 
 #include "engine/mobs/player.hpp"
 
 #include "engine/world/world.hpp"
+
+
 
 int main() {
     Window w = Window(1280, 720, "Red Noise");
@@ -41,6 +44,9 @@ int main() {
 
     float aspect = 1280.0/720.0;
     int tick = 0;
+
+    float t;
+    Ray mRay = mouseRay(w.mouse, camera);
 
     while (w.isOpen()) {
         w.pollEvents();
@@ -73,7 +79,7 @@ int main() {
 
             if (w.mouseDown(2)) {
                 vec2 delta = w.mouse - start;
-                camera.rot.x = camera.rot.x + delta.x * 1280.0 * 0.1;
+                camera.rot = camera.rot + vec3(delta, 0.0) * 1280.0 * 0.1;
                 start = w.mouse;
             } else {
                 start = w.mouse;
@@ -100,6 +106,21 @@ int main() {
         render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
         render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(1.0, 0.0, 0.0, 1.0));
         
+
+        vec3 a = vec3(-world.tileS.x, 0.0, -world.tileS.y) * 0.5;
+        vec3 b = vec3(-world.tileS.x, 0.0, world.tileS.y) * 0.5;
+        vec3 c = vec3(world.tileS.x, 0.0, world.tileS.y) * 0.5;
+
+        if (rayTriangle(mRay, a, b, c, t)) {
+            render.drawTri(a, b, c, vec4(1.0, 1.0, 1.0, 1.0));
+        } else {
+            render.drawTri(a, b, c, vec4(0.5, 0.5, 0.5, 1.0));
+        }
+
+        if (w.isKeyPressed("r")) {
+            camera.rot = vec3(0.0);
+        }
+
 
         if (w.isKeyPressed("esc")) {
             break;
