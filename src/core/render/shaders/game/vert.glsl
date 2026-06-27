@@ -26,15 +26,15 @@ vec3 transformModel(vec3 p) {
 
     vec3 r = radians(modelRot);
 
-    float y = p.y;
-    float z = p.z;
-    p.y = y * cos(r.x) - z * sin(r.x);
-    p.z = y * sin(r.x) + z * cos(r.x);
-
     float x = p.x;
+    float z = p.z;
+    p.x = x * cos(r.x) - z * sin(r.x);
+    p.z = x * sin(r.x) + z * cos(r.x);
+
+    float y = p.y;
     z = p.z;
-    p.x = x * cos(r.y) + z * sin(r.y);
-    p.z = -x * sin(r.y) + z * cos(r.y);
+    p.y = y * cos(r.y) + z * sin(r.y);
+    p.z = -y * sin(r.y) + z * cos(r.y);
 
     x = p.x;
     y = p.y;

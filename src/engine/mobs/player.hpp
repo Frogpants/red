@@ -9,8 +9,11 @@
 
 struct Player {
     float speed;
+
     vec3 pos;
     vec3 vel;
+
+    vec3 rot;
 
     float dir = 0.0;
 

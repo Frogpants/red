@@ -120,7 +120,9 @@ int main() {
 
         camera.follow(player.pos, 0.05);
 
-        render.drawMesh(scene, "cube", player.pos, vec3(0.0, 0.0, 0.0), vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
+        player.rot.x = (-180.0 * atan2(w.mouse.y - player.pos.z, w.mouse.x - player.pos.x)) / 3.14159;
+
+        render.drawMesh(scene, "cube", player.pos, player.rot, vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
         world.render(scene, render, camera);
 
         
