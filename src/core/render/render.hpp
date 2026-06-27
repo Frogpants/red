@@ -45,16 +45,16 @@ private:
     GLuint quadVAO, quadVBO;
 
     std::vector<Vertex> vertices;
-    std::vector<Model> models;
+    
 
     int MAX_VERTICES;
 
-    Mesh checkModel(std::string name) {
-        Mesh result;
+    int checkModel(std::string name) {
+        int result = -1;
         for (size_t i = 0; i < models.size(); i++) {
             Model m = models[i];
             if (m.name == name) {
-                result = m.mesh;
+                result = i;
                 break;
             }
         }
@@ -75,6 +75,7 @@ private:
 
 public:
     vec4 clear;
+    std::vector<Model> models;
 
     Render() {
         clear = vec4(vec3(0.0), 1.0);
@@ -99,7 +100,7 @@ public:
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
         glEnableVertexAttribArray(2);
 
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
         glEnableVertexAttribArray(3);
 
 
@@ -132,6 +133,8 @@ public:
     void beginFrame(RenderTexture& rt) {
         target = &rt;
         activeShader = &rt.triShader;
+
+        glEnable(GL_DEPTH_TEST);
 
         glBindFramebuffer(GL_FRAMEBUFFER, rt.fbo);
         glViewport(0, 0, rt.width, rt.height);
@@ -256,19 +259,48 @@ public:
         drawQuad(start + vec3(-0.001, 0.0, 0.0), start + vec3(0.001, 0.0, 0.0), end + vec3(0.001, 0.0, 0.0), end + vec3(-0.001, 0.0, 0.0), color);
     }
 
-    // void drawMesh(Mesh& mesh) {
-    //     currentShader->bind();
-    //     mesh.draw();
-    // }
+    void addModel(std::string name, std::string path) {
+        int index = checkModel(name);
+        if (index == -1) {
+            cache(path, name);
+        }
+    }
 
-    // void drawMesh(int c) {
-    //     currentShader->bind();
-    //     models[c].mesh.draw();
-    // }
+    void drawMesh(Mesh& mesh, vec3 position = vec3(0.0f), vec3 rotation = vec3(0.0f), vec3 scale = vec3(1.0f), vec4 color = vec4(1.0f)) {
+        activeShader->bind();
 
-    // void drawMesh(std::string c) {
-    //     currentShader->bind();
-    //     Mesh m = checkModel(c);
-    //     m.draw();
-    // }
+        activeShader->setUniform((GLchar*)"modelPos", position);
+        activeShader->setUniform((GLchar*)"modelRot", rotation);
+        activeShader->setUniform((GLchar*)"modelScale", scale);
+
+        activeShader->setUniform((GLchar*)"modelColor", color);
+
+        mesh.draw();
+    }
+
+    void drawMesh(int c, vec3 position = vec3(0.0f), vec3 rotation = vec3(0.0f), vec3 scale = vec3(1.0f), vec4 color = vec4(1.0f)) {
+        activeShader->bind();
+
+        activeShader->setUniform((GLchar*)"modelPos", position);
+        activeShader->setUniform((GLchar*)"modelRot", rotation);
+        activeShader->setUniform((GLchar*)"modelScale", scale);
+
+        activeShader->setUniform((GLchar*)"modelColor", color);
+
+        models[c].mesh.draw();
+    }
+
+    void drawMesh(RenderTexture& src, std::string c, vec3 position = vec3(0.0f), vec3 rotation = vec3(0.0f), vec3 scale = vec3(1.0f), vec4 color = vec4(1.0f)) {
+        src.triShader.bind();
+        int index = checkModel(c);
+        Mesh m = models[index].mesh;
+
+        src.triShader.setUniform((GLchar*)"modelPos", position);
+        src.triShader.setUniform((GLchar*)"modelRot", rotation);
+        src.triShader.setUniform((GLchar*)"modelScale", scale);
+
+        src.triShader.setUniform((GLchar*)"modelColor", color);
+
+        m.draw();
+    }
 };

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../../core/math/essentials.hpp"
+
 #include "../../core/render/render.hpp"
+#include "../../core/render/rendertexture.hpp"
 #include "../../core/render/camera.hpp"
 
 
@@ -14,7 +16,7 @@ struct Tile {
     vec2 tileC;
     vec2 tileS;
 
-    void update(Render& r, Camera& cam, float WIDTH, std::vector<int>& world) {
+    void update(RenderTexture& s, Render& r, Camera& cam, float WIDTH, std::vector<int>& world) {
         vec3 temp = pos - cam.pos;
         if (abs(temp.x) > tileC.x * (tileS.x / 2.0)) {
             if (temp.x < 0.0) {
@@ -36,16 +38,10 @@ struct Tile {
             }
         }
 
-        // r.drawMesh(world[index]);
-
-        if (world[index] == 1) {
-            vec3 a = pos + vec3(-tileS.x, 0.0, -tileS.y) * 0.5;
-            vec3 b = pos + vec3(-tileS.x, 0.0, tileS.y) * 0.5;
-            vec3 c = pos + vec3(tileS.x, 0.0, tileS.y) * 0.5;
-            vec3 d = pos + vec3(tileS.x, 0.0, -tileS.y) * 0.5;
-            r.drawQuad(a, b, c, d, vec4(0.416, 0.745, 0.188, 1.0));
-        } else {
-            // r.drawLine(pos, pos + vec3(0.0, tileS.x / 1.5, 0.0), vec4(0.5, 0.5, 1.0, 1.0));
+        float height = 0.0;
+        if (index >= 0.0) {
+            height = ((float)world[index]) * 0.002;
         }
+        r.drawMesh(s, "cube", pos + vec3(0.0, 2.0 * height, 0.0), vec3(0.0), vec3(0.01, 0.002 + height, 0.01) * 5.0);
     }
 };

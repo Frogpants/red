@@ -43,5 +43,5 @@ void main()
 
     vec3 col = vertexColor.rgb * lighting;
 
-    FragColor = vec4(col, t.a);
+    FragColor = vec4(col, 1.0);
 }

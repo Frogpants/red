@@ -46,6 +46,16 @@ struct RenderTexture {
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "Framebuffer incomplete\n";
 
+        GLint type;
+        glGetFramebufferAttachmentParameteriv(
+            GL_FRAMEBUFFER,
+            GL_DEPTH_STENCIL_ATTACHMENT,
+            GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+            &type
+        );
+
+        std::cout << "Depth attachment type: " << type << std::endl;
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

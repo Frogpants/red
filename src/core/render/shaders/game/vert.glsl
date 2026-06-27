@@ -10,14 +10,45 @@ uniform vec3 cam;
 uniform vec3 rot;
 uniform float f;
 
+uniform vec3 modelPos;
+uniform vec3 modelRot;
+uniform vec3 modelScale;
+uniform vec4 modelColor;
+
 
 out vec3 vNormal;
 out vec4 vertexColor;
 out vec2 vUV;
 
 
+vec3 transformModel(vec3 p) {
+    p *= modelScale;
+
+    vec3 r = radians(modelRot);
+
+    float y = p.y;
+    float z = p.z;
+    p.y = y * cos(r.x) - z * sin(r.x);
+    p.z = y * sin(r.x) + z * cos(r.x);
+
+    float x = p.x;
+    z = p.z;
+    p.x = x * cos(r.y) + z * sin(r.y);
+    p.z = -x * sin(r.y) + z * cos(r.y);
+
+    x = p.x;
+    y = p.y;
+    p.x = x * cos(r.z) - y * sin(r.z);
+    p.y = x * sin(r.z) + y * cos(r.z);
+
+    p += modelPos;
+
+    return p;
+}
+
 vec3 project() {
-    vec3 p = position - cam;
+    vec3 p = transformModel(position);
+    p = p - cam;
 
     vec3 trig = radians(rot);
 
@@ -43,6 +74,10 @@ vec3 project() {
 
     // p.xy = clamp(p.xy, vec2(-1.0), vec2(1.0));
 
+    float near = 0.01;
+    float far  = 1.0;
+
+
     return vec3(p.xy * f, -p.z);
 }
 
@@ -50,7 +85,7 @@ void main()
 {
     gl_Position = vec4(project(), 1.0);
 
-    vertexColor = color;
+    vertexColor = color * modelColor;
     vNormal = normal;
 
     vUV = uv;

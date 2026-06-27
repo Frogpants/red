@@ -6,6 +6,7 @@
 #include "../../core/math/noise.hpp"
 
 #include "../../core/render/render.hpp"
+#include "../../core/render/rendertexture.hpp"
 #include "../../core/render/camera.hpp"
 
 #include "tile.hpp"
@@ -27,7 +28,7 @@ struct World {
 
         size = vec2(width, height);
         for (int i = 0; i < width * height; i++) {
-            int type = noise.randInt(0, 1);
+            int type = noise.randInt(1, 4);
             world.push_back(type);
             lighting.push_back(0.0);
         }
@@ -54,11 +55,11 @@ struct World {
         tiles.push_back(tile);
     }
 
-    void render(Render& r, Camera& c) {
+    void render(RenderTexture& s, Render& r, Camera& c) {
         for (Tile& tile : tiles) {
             tile.tileC = tileC;
             tile.tileS = tileS;
-            tile.update(r, c, size.x, world);
+            tile.update(s, r, c, size.x, world);
         }
     }
 

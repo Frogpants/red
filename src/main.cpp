@@ -21,9 +21,11 @@ int main() {
     Render render;
     render.init();
 
+    render.addModel("cube", "src/assets/models/objs/cube.obj");
+
 
     Player player;
-    player.pos = vec3(0.0, 0.05, 0.0);
+    player.pos = vec3(0.0, 0.11, 0.0);
     player.vel = vec3(0.0);
     player.speed = 0.001;
 
@@ -71,13 +73,13 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, missing.texture);
         scene.triShader.setUniform("tex", 1);
 
-        scene.triShader.setUniform("lightDir", normalize(camera.rot));
+        scene.triShader.setUniform("lightDir", vec3(0.3f, 0.9f, 0.4f));
         scene.triShader.setUniform("lightColor", vec3(1.0));
         scene.triShader.setUniform("ambient", 1.0);
 
         tick += 1;
 
-        if (tick % 4 == 0) {
+        if (tick % 2 == 0) {
             player.checkMovement(w, camera);
 
             if (w.isKeyPressed("e")) {
@@ -98,7 +100,7 @@ int main() {
 
             if (w.mouseDown(2)) {
                 vec2 delta = w.mouse - start;
-                camera.rot = camera.rot + vec3(delta, 0.0) * 1280.0 * 0.1;
+                camera.rot = camera.rot - vec3(delta, 0.0) * 1280.0 * 0.1;
                 start = w.mouse;
             } else {
                 start = w.mouse;
@@ -118,13 +120,12 @@ int main() {
 
         camera.follow(player.pos, 0.05);
 
-
-        world.render(render, camera);
+        render.drawMesh(scene, "cube", player.pos, vec3(0.0, 0.0, 0.0), vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
+        world.render(scene, render, camera);
 
         
         // render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
-        render.drawRect(player.pos, vec2(0.05 / aspect, 0.05), vec4(1.0, 0.0, 0.0, 1.0));
-
+        
         if (w.isKeyPressed("r")) {
             camera.rot = vec3(0.0);
         }

@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include <GL/glew.h>
@@ -18,30 +19,28 @@ struct Vert {
 
 class Mesh {
 public:
-    GLuint vao;
-    GLuint vbo;
+    GLuint vao = 0;
+    GLuint vbo = 0;
 
-    int vertexCount;
+    GLsizei vertexCount = 0;
 
-    Mesh() {
-        vao = 0;
-        vbo = 0;
-        vertexCount = 0;
-    }
+    Mesh() = default;
 
-    void upload(std::vector<Vert>& vertices) {
-        vertexCount = vertices.size();
+    void upload(const std::vector<Vert>& vertices) {
+        vertexCount = (GLsizei)vertices.size();
 
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
+        if (!vao) glGenVertexArrays(1, &vao);
+        if (!vbo) glGenBuffers(1, &vbo);
 
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER,
+                    vertexCount * sizeof(Vert),
+                    vertices.data(),
+                    GL_STATIC_DRAW);
 
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vert), vertices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, position));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)0);
         glEnableVertexAttribArray(0);
 
         glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vert), (void*)offsetof(Vert, color));
@@ -54,19 +53,26 @@ public:
         glEnableVertexAttribArray(3);
 
         glBindVertexArray(0);
+
+        // IMPORTANT: unbind buffer too
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void draw() {
+    void draw() const {
         glBindVertexArray(vao);
-
         glDrawArrays(GL_TRIANGLES, 0, vertexCount);
     }
 };
 
-
-inline Mesh LoadOBJ(const std::string& path)
-{
+inline Mesh LoadOBJ(const std::string& path) {
     std::ifstream file(path);
+
+    Mesh mesh;
+
+    if (!file.is_open()) {
+        std::cout << "Failed to open OBJ: " << path << std::endl;
+        return mesh;
+    }
 
     std::vector<vec3> positions;
     std::vector<vec2> uvs;
@@ -83,52 +89,92 @@ inline Mesh LoadOBJ(const std::string& path)
         ss >> type;
 
         if (type == "v") {
-            float x, y, z;
+            float x,y,z;
             ss >> x >> y >> z;
 
-            positions.push_back(vec3(x, y, z));
+            positions.emplace_back(x,y,z);
         } else if (type == "vt") {
-            float u, v;
+            float u,v;
             ss >> u >> v;
 
-            uvs.push_back(vec2(u, v));
+            uvs.emplace_back(u,v);
         } else if (type == "vn") {
-            float x, y, z;
+            float x,y,z;
             ss >> x >> y >> z;
 
-            normals.push_back(vec3(x, y, z));
+            normals.emplace_back(x,y,z);
         } else if (type == "f") {
-            for (int i = 0; i < 3; i++) {
-                std::string vert;
-                ss >> vert;
+            struct FaceIndex {
+                int p=-1;
+                int uv=-1;
+                int n=-1;
+            };
 
-                std::stringstream vs(vert);
+            std::vector<FaceIndex> face;
 
-                std::string pStr;
-                std::string uvStr;
-                std::string nStr;
+            std::string token;
 
-                std::getline(vs, pStr, '/');
-                std::getline(vs, uvStr, '/');
-                std::getline(vs, nStr, '/');
+            while (ss >> token) {
+                FaceIndex idx;
 
-                int p = std::stoi(pStr) - 1;
-                int uv = std::stoi(uvStr) - 1;
-                int n = std::stoi(nStr) - 1;
+                std::stringstream vs(token);
 
-                Vert v;
-                v.position = positions[p];
-                v.uv = uvs[uv];
-                v.normal = normals[n];
-                v.color = vec4(1.0);
+                std::string p,uv,n;
 
-                vertices.push_back(v);
+                std::getline(vs,p,'/');
+                std::getline(vs,uv,'/');
+                std::getline(vs,n,'/');
+
+                if (!p.empty()) {
+                    idx.p = std::stoi(p)-1;
+                }
+
+                if (!uv.empty()) {
+                    idx.uv = std::stoi(uv)-1;
+                }
+
+                if (!n.empty()) {
+                    idx.n = std::stoi(n)-1;
+                }
+
+                face.push_back(idx);
+            }
+
+            if (face.size() < 3) {
+                continue;
+            }
+
+            for (size_t i = 1; i + 1 < face.size(); i++) {
+                FaceIndex tri[3] = {face[0], face[i], face[i+1]};
+
+                for (int j=0;j<3;j++) {
+                    Vert v;
+
+                    v.color = vec4(1.0f);
+
+                    v.position = positions[tri[j].p];
+
+                    if (tri[j].uv >= 0) {
+                        v.uv = uvs[tri[j].uv];
+                    } else {
+                        v.uv = vec2(0.0f);
+                    }
+
+                    if (tri[j].n >= 0) {
+                        v.normal = normals[tri[j].n];
+                    } else {
+                        v.normal = vec3(0.0f,1.0f,0.0f);
+                    }
+
+                    vertices.push_back(v);
+                }
             }
         }
     }
 
-    Mesh mesh;
     mesh.upload(vertices);
+
+    std::cout << "Loaded OBJ: " << path << " (" << vertices.size()/3 << " triangles)" << std::endl;
 
     return mesh;
 }
