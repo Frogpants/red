@@ -4,6 +4,7 @@
 
 #include "core/render/window.hpp"
 #include "core/render/render.hpp"
+#include "core/render/rendertexture.hpp"
 #include "core/render/camera.hpp"
 
 #include "core/math/essentials.hpp"
@@ -37,6 +38,13 @@ int main() {
     world.create(100.0, 100.0);
 
 
+    RenderTexture scene;
+    scene.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
+
+    RenderTexture post;
+    post.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
+
+
     vec2 start = vec2(0.0);
 
 
@@ -50,15 +58,16 @@ int main() {
 
     while (w.isOpen()) {
         w.pollEvents();
-        render.beginFrame();
+        render.beginFrame(scene);
 
-        render.shader.setUniform((GLchar*)"cam", camera.pos);
-        render.shader.setUniform((GLchar*)"rot", camera.rot);
-        render.shader.setUniform((GLchar*)"f", camera.focal);
+        scene.triShader.bind();
+        scene.triShader.setUniform((GLchar*)"cam", camera.pos);
+        scene.triShader.setUniform((GLchar*)"rot", camera.rot);
+        scene.triShader.setUniform((GLchar*)"f", camera.focal);
 
         tick += 1;
 
-        if (tick % 5 == 0) {
+        if (tick % 4 == 0) {
             player.checkMovement(w, camera);
 
             if (w.isKeyPressed("e")) {
@@ -127,6 +136,16 @@ int main() {
         }
 
         render.endFrame();
+
+
+        render.beginFrame(post);
+        render.drawTexture(scene);
+        render.endFrame();
+
+
+        render.present(post, 1280, 720);
+
+
         w.swapBuffers();
     }
 

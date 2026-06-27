@@ -129,6 +129,7 @@ private:
         return texture;
     }
 
+
 public:
 
     void load() {
@@ -139,6 +140,15 @@ public:
         glShaderSource(vertShader, 1, &vertSource, nullptr);
         glCompileShader(vertShader);
 
+        GLint success;
+        glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            char log[1024];
+            glGetShaderInfoLog(vertShader, 1024, NULL, log);
+            std::cout << "Vertex Shader:\n" << log << std::endl;
+        }
+
 
         fragShader = glCreateShader(GL_FRAGMENT_SHADER);
         fragCode = openFile(frag);
@@ -146,6 +156,14 @@ public:
         const char* fragSource = fragCode.c_str();
         glShaderSource(fragShader, 1, &fragSource, nullptr);
         glCompileShader(fragShader);
+
+        glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            char log[1024];
+            glGetShaderInfoLog(fragShader, 1024, NULL, log);
+            std::cout << "Vertex Shader:\n" << log << std::endl;
+        }
 
 
         program = glCreateProgram();
@@ -155,13 +173,17 @@ public:
 
         glLinkProgram(program);
 
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
+
+        std::cout << "Program linked = " << success << std::endl;
+
         glDeleteShader(vertShader);
         glDeleteShader(fragShader);
     }
 
     void load(std::string _vert, std::string _frag) {
-        vert = _vert;
-        frag = _frag;
+        vert = "src/core/render/shaders/" + _vert;
+        frag = "src/core/render/shaders/" + _frag;
 
         load();
     }
@@ -230,13 +252,23 @@ public:
         glUniform1i(l, inp);
     }
 
-    void setUniform(GLchar* name, std::string inp) {
-        GLint l = checkSaved(name);
-        if (l == -1) {
-            GLint location = glGetUniformLocation(program, name);
-            cache(name, location);
-            l = location;
+    void setTexture(GLchar* uniform, GLuint texture, GLint unit = 0) {
+        bind();
+
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        GLint l = checkSaved(uniform);
+        if (l == -1)
+        {
+            l = glGetUniformLocation(program, uniform);
+            cache(uniform, l);
         }
-        glUniform1i(l, getTex(inp));
+
+        glUniform1i(l, unit);
+    }
+
+    void setTexture(GLchar* uniform, const std::string& path, GLint unit = 0) {
+        setTexture(uniform, getTex(path), unit);
     }
 };

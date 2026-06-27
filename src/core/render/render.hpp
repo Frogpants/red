@@ -10,6 +10,7 @@
 #include "../files/model.hpp"
 
 #include "shader.hpp"
+#include "rendertexture.hpp"
 
 
 
@@ -34,8 +35,13 @@ struct Model {
 
 class Render {
 private:
+    RenderTexture* target;
+    Shader* activeShader = nullptr;
+
     GLuint vao;
     GLuint vbo;
+
+    GLuint quadVAO, quadVBO;
 
     std::vector<Vertex> vertices;
     std::vector<Model> models;
@@ -63,8 +69,6 @@ private:
     }
 
 public:
-    Shader shader;
-
     vec4 clear;
 
     Render() {
@@ -90,47 +94,90 @@ public:
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
         glEnableVertexAttribArray(2);
 
-        shader.load();
-    }
 
-    void init(std::string vert, std::string frag) {
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
 
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
 
-        glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
+        float quad[] = {
+            // pos      // uv
+            -1,-1, 0,   0,0,
+            -1, 1, 0,   0,1,
+            1, 1, 0,   1,1,
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+            -1,-1, 0,   0,0,
+            1, 1, 0,   1,1,
+            1,-1, 0,   1,0
+        };
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-        glEnableVertexAttribArray(1);
-
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(2);
-
-        shader.load(vert, frag);
     }
 
-    void beginFrame() {
+    void beginFrame(RenderTexture& rt) {
+        target = &rt;
+        activeShader = &rt.triShader;
+
+        glBindFramebuffer(GL_FRAMEBUFFER, rt.fbo);
+        glViewport(0, 0, rt.width, rt.height);
+
         vertices.clear();
 
         glClearColor(clear.x, clear.y, clear.z, clear.w);
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     void endFrame() {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
+        if (vertices.empty()) {
+            return;
+        }
 
-        shader.bind();
+        glBindFramebuffer(GL_FRAMEBUFFER, target->fbo);
+        glViewport(0, 0, target->width, target->height);
+
+        activeShader->bind();
 
         glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+        vertices.clear();
+    }
+
+    void drawTexture(RenderTexture& src) {
+        activeShader = &target->postShader;
+
+        activeShader->bind();
+
+        activeShader->setTexture((GLchar*)"screenTex", src.texture);
+
+        drawQuad(vec2(-1.0f, -1.0f), vec2(-1.0f,  1.0f), vec2( 1.0f,  1.0f), vec2( 1.0f, -1.0f), vec4(1.0f));
+    }
+
+    void present(RenderTexture& src, int width, int height) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, width, height);
+
+        glDisable(GL_DEPTH_TEST);
+
+        src.postShader.bind();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, src.texture);
+        src.postShader.setUniform((GLchar*)"screenTex", 0);
+
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     void drawTri(vec2 a, vec2 b, vec2 c, vec4 color) {
@@ -190,19 +237,19 @@ public:
         drawQuad(start + vec3(-0.001, 0.0, 0.0), start + vec3(0.001, 0.0, 0.0), end + vec3(0.001, 0.0, 0.0), end + vec3(-0.001, 0.0, 0.0), color);
     }
 
-    void drawMesh(Mesh& mesh) {
-        shader.bind();
-        mesh.draw();
-    }
+    // void drawMesh(Mesh& mesh) {
+    //     currentShader->bind();
+    //     mesh.draw();
+    // }
 
-    void drawMesh(int c) {
-        shader.bind();
-        models[c].mesh.draw();
-    }
+    // void drawMesh(int c) {
+    //     currentShader->bind();
+    //     models[c].mesh.draw();
+    // }
 
-    void drawMesh(std::string c) {
-        shader.bind();
-        Mesh m = checkModel(c);
-        m.draw();
-    }
+    // void drawMesh(std::string c) {
+    //     currentShader->bind();
+    //     Mesh m = checkModel(c);
+    //     m.draw();
+    // }
 };

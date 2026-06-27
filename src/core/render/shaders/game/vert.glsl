@@ -37,6 +37,8 @@ vec3 project() {
 
     // p.z = max(p.z, 0.1);
 
+    // p.xy = clamp(p.xy, vec2(-1.0), vec2(1.0));
+
     return vec3(p.xy * f, -p.z);
 }
 
