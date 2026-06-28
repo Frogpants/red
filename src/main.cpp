@@ -22,6 +22,8 @@ int main() {
     render.init();
 
     render.addModel("cube", "src/assets/models/objs/cube.obj");
+    render.addModel("monkey", "src/assets/models/objs/monkey.obj");
+    render.addModel("moon", "src/assets/models/objs/Moon-2K.obj");
 
 
     Player player;
@@ -45,6 +47,8 @@ int main() {
 
     scene.triShader.addTex("src/assets/textures/null.png");
     Texture missing = scene.triShader.textures[0];
+    scene.triShader.addTex("src/assets/textures/Diffuse_2K.png");
+    Texture moon = scene.triShader.textures[1];
 
     RenderTexture post;
     post.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
@@ -70,12 +74,13 @@ int main() {
         scene.triShader.setUniform("rot", camera.rot);
         scene.triShader.setUniform("f", camera.focal);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, missing.texture);
+        glBindTexture(GL_TEXTURE_2D, moon.texture);
         scene.triShader.setUniform("tex", 1);
 
-        scene.triShader.setUniform("lightDir", vec3(0.3f, 0.9f, 0.4f));
-        scene.triShader.setUniform("lightColor", vec3(1.0));
-        scene.triShader.setUniform("ambient", 1.0);
+        scene.triShader.setUniform("lightDir", vec3(0.5f, 1.0f, 0.5f));
+
+        scene.triShader.setUniform("lightColor", vec3(1.0f));
+        scene.triShader.setUniform("ambient", vec3(0.0));
 
         tick += 1;
 
@@ -126,7 +131,9 @@ int main() {
         world.render(scene, render, camera);
 
         
-        // render.drawRect(vec2(0, -0.8), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
+        render.drawRect(player.pos + vec3(0.0, 0.8, 0.0), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
+        // render.drawMesh(scene, "cube", player.pos + vec3(0.0, 0.15, 0.0), camera.rot * vec3(-1.0, 0.0, 1.0), vec3(0.001 * player.stamina, 0.01, aspect * 0.001), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
+        render.drawMesh(scene, "moon", vec3(0.0, 0.2, 0.0), vec3((float)tick * 0.1, 0.0, 0.0), vec3(0.1) / vec3(aspect, 1.0, aspect), vec4(1.0, 1.0, 1.0, 0.0));
         
         if (w.isKeyPressed("r")) {
             camera.rot = vec3(0.0);

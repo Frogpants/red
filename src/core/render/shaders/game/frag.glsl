@@ -9,6 +9,7 @@ uniform vec3 ambient;
 in vec4 vertexColor;
 in vec2 vUV;
 in vec3 vNormal;
+in vec3 vPosition;
 
 out vec4 FragColor;
 
@@ -32,7 +33,12 @@ float noise(vec2 st) {
 void main()
 {
     vec2 uv = vUV;
+    vec2 c = uv + vPosition.xz / vec2(0.1);
+    vec2 st = floor(c * 32.0) / 32.0;
     vec4 t = texture(tex, uv);
+    float alpha = t.a;
+
+    float n = noise(st * 100.0) * 0.1 + 0.9;
 
     vec3 N = normalize(vNormal);
     vec3 L = normalize(lightDir);
@@ -41,7 +47,8 @@ void main()
     vec3 lighting = ambient + diff * lightColor;
     lighting = clamp(lighting, 0.0, 1.0);
 
-    vec3 col = vertexColor.rgb * lighting;
+    vec3 col =  t.rgb * vertexColor.rgb * lighting * n;
+    alpha *= vertexColor.a;
 
-    FragColor = vec4(col, 1.0);
+    FragColor = vec4(col, alpha);
 }

@@ -19,11 +19,11 @@ uniform vec4 modelColor;
 out vec3 vNormal;
 out vec4 vertexColor;
 out vec2 vUV;
+out vec3 vPosition;
 
 
-vec3 transformModel(vec3 p) {
-    p *= modelScale;
-
+vec3 rotateModel(vec3 p)
+{
     vec3 r = radians(modelRot);
 
     float x = p.x;
@@ -41,14 +41,25 @@ vec3 transformModel(vec3 p) {
     p.x = x * cos(r.z) - y * sin(r.z);
     p.y = x * sin(r.z) + y * cos(r.z);
 
+    return p;
+}
+
+vec3 transformModel(vec3 p)
+{
+    p *= modelScale;
+    p = rotateModel(p);
     p += modelPos;
 
     return p;
 }
 
-vec3 project() {
-    vec3 p = transformModel(position);
-    p = p - cam;
+vec3 transformNormal(vec3 n)
+{
+    return normalize(rotateModel(n));
+}
+
+vec3 project(vec3 point) {
+    vec3 p = point - cam;
 
     vec3 trig = radians(rot);
 
@@ -83,10 +94,14 @@ vec3 project() {
 
 void main()
 {
-    gl_Position = vec4(project(), 1.0);
+    vec3 worldPos = transformModel(position);
+
+    gl_Position = vec4(project(worldPos), 1.0);
+
+    vPosition = worldPos;
+    vNormal = transformNormal(normal);
 
     vertexColor = color * modelColor;
-    vNormal = normal;
 
     vUV = uv;
 }
