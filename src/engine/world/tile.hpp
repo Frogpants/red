@@ -39,9 +39,9 @@ struct Tile {
         }
 
         float height = 0.0;
-        if (index >= 0.0) {
-            height = ((float)world[index]) * 0.002;
-        }
+        // if (index >= 0.0) {
+        //     height = ((float)world[index]) * 0.002;
+        // }
         r.drawMesh(s, "cube", pos + vec3(0.0, 2.0 * height, 0.0), vec3(0.0), vec3(0.01, 0.002 + height, 0.01) * 5.0);
     }
 };

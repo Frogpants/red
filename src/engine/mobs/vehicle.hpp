@@ -7,35 +7,36 @@
 #include "../../core/render/camera.hpp"
 #include "../../core/render/render.hpp"
 
-struct Player {
+struct Vehicle {
     float speed;
 
     vec3 pos;
     vec3 vel;
+    vec3 accel;
 
+    vec3 rv;
     vec3 rot;
 
-    float dir = 0.0;
+    float dir = -135.0;
 
-    float stamina = 100.0;
-
-    bool inVehicle = false;
+    float fuel = 100.0;
 
     void checkMovement(Window& w, Camera& c) {
         float mult = 1.0;
-        if (w.isKeyPressed("shift") && stamina > 0.0) {
+        if (w.isKeyPressed("shift") && fuel > 0.0) {
             mult = 1.25;
-            stamina -= 0.5;
+            fuel -= 0.01;
         } else {
-            stamina += 0.1;
+            fuel += 0.1;
         }
 
-        if (stamina < 0.0) {
-            stamina = 0.0;
-        } else if (stamina > 100.0) {
-            stamina = 100.0;
+        if (fuel < 0.0) {
+            fuel = 0.0;
+        } else if (fuel > 100.0) {
+            fuel = 100.0;
         }
 
+        accel = vec3(0.0);
         if (w.isKeyPressed("w")) {
             move(c, mult, dir);
         }
@@ -44,17 +45,17 @@ struct Player {
         }
 
         if (w.isKeyPressed("d")) {
-            move(c, mult * 0.5, dir + 90.0);
+            rv.x += 0.1;
         }
         if (w.isKeyPressed("a")) {
-            move(c, -mult * 0.5, dir + 90.0);
+            rv.x += -0.1;
         }
     }
 
     void move(Camera& c, float mult, float d) {
         float angle = c.rot.x - d;
-        vel.x = vel.x - mult * speed * sin(radians(angle));
-        vel.z = vel.z - mult * speed * cos(radians(angle));
+        accel.x = mult * speed * sin(radians(angle));
+        accel.z = mult * speed * cos(radians(angle));
     }
 };
 

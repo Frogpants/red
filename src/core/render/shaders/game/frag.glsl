@@ -47,7 +47,7 @@ void main()
     vec3 lighting = ambient + diff * lightColor;
     lighting = clamp(lighting, 0.0, 1.0);
 
-    vec3 col =  t.rgb * vertexColor.rgb * lighting * n;
+    vec3 col =  vertexColor.rgb * lighting * n;
     alpha *= vertexColor.a;
 
     FragColor = vec4(col, alpha);
