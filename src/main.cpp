@@ -17,6 +17,32 @@
 
 
 
+vec3 screenToWorld(vec2 mouse, float depth, Camera& c) {
+    vec3 p(mouse.x / c.focal, mouse.y / c.focal, depth);
+
+    vec3 r = radians(c.rot);
+
+    float x = p.x;
+    float y = p.y;
+    p.x = x * cos(-r.z) - y * sin(-r.z);
+    p.y = x * sin(-r.z) + y * cos(-r.z);
+
+    y = p.y;
+    float z = p.z;
+    p.y = y * cos(-r.y) - z * sin(-r.y);
+    p.z = y * sin(-r.y) + z * cos(-r.y);
+
+    x = p.x;
+    z = p.z;
+    p.x = x * cos(-r.x) - z * sin(-r.x);
+    p.z = x * sin(-r.x) + z * cos(-r.x);
+
+    p += c.pos;
+
+    return p;
+}
+
+
 int main() {
     Window w = Window(1280, 720, "Red Noise");
     Render render;
@@ -29,7 +55,7 @@ int main() {
 
 
     Player player;
-    player.pos = vec3(0.0, 0.11, 0.0);
+    player.pos = vec3(0.0, 0.15, 0.0);
     player.vel = vec3(0.0);
     player.speed = 0.001;
 
@@ -61,6 +87,9 @@ int main() {
     RenderTexture post;
     post.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
 
+    // RenderTexture post;
+    // post.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
+
 
     vec2 start = vec2(0.0);
 
@@ -85,10 +114,10 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, moon.texture);
         scene.triShader.setUniform("tex", 1);
 
-        scene.triShader.setUniform("lightDir", vec3(0.5f, 1.0f, 0.5f));
+        scene.triShader.setUniform("lightDir", vec3(0.5f, 1.0f, 0.4f));
 
         scene.triShader.setUniform("lightColor", vec3(1.0f));
-        scene.triShader.setUniform("ambient", vec3(0.0));
+        scene.triShader.setUniform("ambient", vec3(0.15));
 
         tick += 1;
 
@@ -169,7 +198,7 @@ int main() {
         // render.drawMesh(scene, "car", car.pos, car.rot, vec3(0.1) / vec3(aspect, 1.0, aspect), vec4(1.0));
         
         if (w.isKeyPressed("r")) {
-            camera.rot = vec3(0.0);
+            camera.rot = vec3(45.0, 35.264, 0.0);
         }
 
 

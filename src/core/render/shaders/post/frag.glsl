@@ -10,29 +10,56 @@ void main()
     vec2 resolution = vec2(512.0);
     vec2 pixelSize = 1.0 / resolution;
 
-    vec2 cell = floor(TexCoord * resolution) / resolution;
-    float aaStrength = 1.0;
+    vec2 cell = floor(TexCoord * resolution) * pixelSize;
+    vec2 center = cell + pixelSize * 0.5;
 
-    vec2 offsets[4];
-    offsets[0] = vec2(0.25, 0.25);
-    offsets[1] = vec2(0.75, 0.25);
-    offsets[2] = vec2(0.25, 0.75);
-    offsets[3] = vec2(0.75, 0.75);
+    // ---------- Base Pixel ----------
+    vec2 blur = pixelSize * 0.5;
 
-    vec4 col = vec4(0.0);
+    vec4 base = vec4(0.0);
+    base += texture(screenTex, center);
+    base += texture(screenTex, center + vec2( blur.x, 0.0));
+    base += texture(screenTex, center + vec2(-blur.x, 0.0));
+    base += texture(screenTex, center + vec2(0.0,  blur.y));
+    base += texture(screenTex, center + vec2(0.0, -blur.y));
+    base /= 5.0;
 
-    for (int i = 0; i < 4; i++)
-    {
-        vec2 uv = cell + offsets[i] * pixelSize;
-        uv = mix(cell, uv, aaStrength);
-        col += texture(screenTex, uv);
-    }
+    // ---------- Fake Bloom ----------
+    vec3 bloom = vec3(0.0);
 
-    col *= 0.25;
+    // const float radius = 3.0;
 
-    float alpha = col.a;
-    vec3 color = col.rgb;
+    // for(int x=-3;x<=3;x++)
+    // {
+    //     for(int y=-3;y<=3;y++)
+    //     {
+    //         vec2 offset = vec2(x,y) * pixelSize;
 
-    FragColor = vec4(color, alpha);
-    // FragColor = texture(screenTex, TexCoord);
+    //         vec3 c = texture(screenTex, center + offset).rgb;
+
+    //         // Extract only bright colors
+    //         float bright = max(max(c.r,c.g),c.b);
+    //         bright = max(bright - 0.75, 0.0);
+
+    //         float weight = 1.0 / (1.0 + dot(vec2(x,y),vec2(x,y)));
+
+    //         bloom += c * bright * weight;
+    //     }
+    // }
+
+    // bloom *= 1.0;
+
+    // ---------- Pixel Art Colors ----------
+    const float levels = 32.0;
+    base.rgb = floor(base.rgb * levels) / levels;
+
+    float gray = dot(base.rgb, vec3(0.299,0.587,0.114));
+    base.rgb = mix(vec3(gray), base.rgb, 1.1);
+
+    base.rgb = (base.rgb - 0.5) * 1.15 + 0.5;
+
+    // ---------- Final ----------
+    base.rgb += bloom;
+
+    FragColor = vec4(clamp(base.rgb,0.0,1.0), base.a);
 }

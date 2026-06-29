@@ -34,7 +34,7 @@ void main()
 {
     vec2 uv = vUV;
     vec2 c = uv + vPosition.xz / vec2(0.1);
-    vec2 st = floor(c * 32.0) / 32.0;
+    vec2 st = floor(c * 16.0) / 16.0;
     vec4 t = texture(tex, uv);
     float alpha = t.a;
 
@@ -47,7 +47,7 @@ void main()
     vec3 lighting = ambient + diff * lightColor;
     lighting = clamp(lighting, 0.0, 1.0);
 
-    vec3 col =  vertexColor.rgb * lighting * n;
+    vec3 col = vertexColor.rgb * lighting * n;
     alpha *= vertexColor.a;
 
     FragColor = vec4(col, alpha);

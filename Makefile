@@ -7,6 +7,7 @@ init:
 
 build:
 	bash scripts/build.sh
+	clear
 
 run: build
 	./build/red

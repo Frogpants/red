@@ -18,20 +18,33 @@ struct Noise {
         return dis(gen);
     }
 
-    vec2 random2(vec2 st){
-        st = vec2( dot(st,vec2(127.1,311.7)), dot(st,vec2(269.5,183.3)) );
-        return fract(sin(st)*43758.5453123)*2.0 - 1.0;
+    int randInt(vec2 p, int a, int b) {
+        float n = noise(p);
+        return a + (int)std::floor((b - a + 1) * n);
     }
 
-    float noise(vec2 st) {
+    float random(vec2 p)
+    {
+        return fract(sin(dot(p, vec2(127.1f, 311.7f))) * 43758.5453f);
+    }
+
+    float noise (vec2 st) {
         vec2 i = floor(st);
         vec2 f = fract(st);
 
-        vec2 u = f*f*(f*-2.0 + 3.0);
+        // Four corners in 2D of a tile
+        float a = random(i);
+        float b = random(i + vec2(1.0, 0.0));
+        float c = random(i + vec2(0.0, 1.0));
+        float d = random(i + vec2(1.0, 1.0));
 
-        return mix( mix( dot( random2(i + vec2(0.0,0.0) ), f - vec2(0.0,0.0) ),
-                        dot( random2(i + vec2(1.0,0.0) ), f - vec2(1.0,0.0) ), u.x),
-                    mix( dot( random2(i + vec2(0.0,1.0) ), f - vec2(0.0,1.0) ),
-                        dot( random2(i + vec2(1.0,1.0) ), f - vec2(1.0,1.0) ), u.x), u.y);
+        // Smooth Interpolation
+
+        // Cubic Hermine Curve.  Same as SmoothStep()
+        vec2 u = f*f*(f * -2.0 + 3.0);
+        // u = smoothstep(0.,1.,f);
+
+        // Mix 4 coorners percentages
+        return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
     }
 };

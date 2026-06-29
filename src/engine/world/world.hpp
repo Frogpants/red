@@ -27,14 +27,21 @@ struct World {
         Noise noise;
 
         size = vec2(width, height);
-        for (int i = 0; i < width * height; i++) {
-            int type = noise.randInt(1, 4);
-            world.push_back(type);
-            lighting.push_back(0.0);
+        vec2 p = vec2(0.0);
+        for (int y = 0; y < height; y++) {
+            p.x = 0.0;
+            for (int x = 0; x < width; x++) {
+                int type = noise.randInt(p * 0.5, 1, 4);
+                world.push_back(type);
+                lighting.push_back(0.0);
+                p.x += 1.0;
+            }
+            p.y += 1.0;
         }
 
+
         int index = 0;
-        vec2 p = vec2(0.0, tileS.y/2.0);
+        p = vec2(0.0, tileS.y/2.0);
         for (int y = 0; y < (int)tileC.y; y++) {
             p.x = tileS.x/2.0;
             for (int x = 0; x < (int)tileC.x; x++) {
