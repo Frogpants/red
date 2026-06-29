@@ -105,58 +105,34 @@ public:
     float y;
     float z;
 
-    vec2 xy;
-    vec2 yz;
-    vec2 xz;
-
     vec3(float x1, float y1, float z1) {
         x = x1;
         y = y1;
         z = z1;
-
-        xy = vec2(x, y);
-        yz = vec2(y, z);
-        xz = vec2(x, z);
     }
 
     vec3(float n) {
         x = n;
         y = n;
         z = n;
-
-        xy = vec2(x, y);
-        yz = vec2(y, z);
-        xz = vec2(x, z);
     }
 
     vec3(vec2 v, float n) {
         x = v.x;
         y = v.y;
         z = n;
-
-        xy = vec2(x, y);
-        yz = vec2(y, z);
-        xz = vec2(x, z);
     }
 
     vec3(float n, vec2 v) {
         x = n;
         y = v.x;
         z = v.y;
-
-        xy = vec2(x, y);
-        yz = vec2(y, z);
-        xz = vec2(x, z);
     }
 
     vec3() {
         x = 0.0;
         y = 0.0;
         z = 0.0;
-
-        xy = vec2(x, y);
-        yz = vec2(y, z);
-        xz = vec2(x, z);
     }
 
     vec3 operator+(const vec3& other) const {
@@ -234,23 +210,11 @@ public:
     float z;
     float w;
 
-    vec3 xyz;
-    vec3 zyx;
-
-    vec3 yzw;
-    vec3 wzy;
-
     vec4(float x1, float y1, float z1, float w1) {
         x = x1;
         y = y1;
         z = z1;
         w = w1;
-
-        xyz = vec3(x, y, z);
-        zyx = vec3(z, y, x);
-
-        yzw = vec3(y, z, w);
-        wzy = vec3(w, z, y);
     }
 
     vec4(float n) {
@@ -258,12 +222,6 @@ public:
         y = n;
         z = n;
         w = n;
-
-        xyz = vec3(x, y, z);
-        zyx = vec3(z, y, x);
-
-        yzw = vec3(y, z, w);
-        wzy = vec3(w, z, y);
     }
 
     vec4(vec3 v, float n) {
@@ -271,12 +229,6 @@ public:
         y = v.y;
         z = v.z;
         w = n;
-
-        xyz = vec3(x, y, z);
-        zyx = vec3(z, y, x);
-
-        yzw = vec3(y, z, w);
-        wzy = vec3(w, z, y);
     }
 
     vec4(float n, vec3 v) {
@@ -284,12 +236,6 @@ public:
         y = v.x;
         z = v.y;
         w = v.z;
-
-        xyz = vec3(x, y, z);
-        zyx = vec3(z, y, x);
-
-        yzw = vec3(y, z, w);
-        wzy = vec3(w, z, y);
     }
 
     vec4(vec2 v1, vec2 v2) {
@@ -297,12 +243,6 @@ public:
         y = v1.y;
         z = v2.x;
         w = v2.y;
-
-        xyz = vec3(x, y, z);
-        zyx = vec3(z, y, x);
-
-        yzw = vec3(y, z, w);
-        wzy = vec3(w, z, y);
     }
 
     vec4() {
@@ -310,12 +250,6 @@ public:
         y = 0.0;
         z = 0.0;
         w = 0.0;
-
-        xyz = vec3(x, y, z);
-        zyx = vec3(z, y, x);
-
-        yzw = vec3(y, z, w);
-        wzy = vec3(w, z, y);
     }
 
     vec4 operator+(const vec4& other) const {

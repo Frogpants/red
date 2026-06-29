@@ -119,11 +119,10 @@ public:
         glfwSetFramebufferSizeCallback(window, FramebufferResizeCallback);
 
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glDepthMask(GL_TRUE);
-        glClearDepth(1.0);
 
-        glDisable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE);
+        // glCullFace(GL_BACK);
+        // glFrontFace(GL_CCW);
     }
 
     ~Window() {

@@ -34,7 +34,7 @@ int main() {
     player.speed = 0.001;
 
     Vehicle car;
-    car.pos = vec3(0.2, -0.01, 0.0);
+    car.pos = vec3(0.2, -0.02, 0.0);
     car.vel = vec3(0.0);
     car.accel = vec3(0.0);
     car.speed = 0.001;
@@ -151,7 +151,7 @@ int main() {
 
         
 
-        player.rot.x = (-180.0 * atan2(w.mouse.y - player.pos.z, w.mouse.x - player.pos.x)) / 3.14159;
+        player.rot.x = (-180.0 * atan2((w.mouse.y + camera.pos.z) - player.pos.z, (w.mouse.x + camera.pos.x) - player.pos.x)) / 3.14159;
 
         if (player.inVehicle) {
             camera.follow(car.pos, 0.05);
@@ -160,13 +160,13 @@ int main() {
             camera.follow(player.pos, 0.05);
         }
 
-        world.render(scene, render, camera);
+        world.render(scene, render, camera, w.mouse);
 
         
         render.drawRect(player.pos + vec3(0.0, 0.8, 0.0), vec2(.006 * player.stamina, aspect * .0125), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
         // render.drawMesh(scene, "cube", player.pos + vec3(0.0, 0.15, 0.0), camera.rot * vec3(-1.0, 0.0, 1.0), vec3(0.001 * player.stamina, 0.01, aspect * 0.001), vec4(135.0/255.0, 206.0/255.0, 235.0/255.0, 1.0));
         // render.drawMesh(scene, "moon", vec3(0.0, 0.2, 0.0), vec3((float)tick * 0.1, 0.0, 0.0), vec3(0.1) / vec3(aspect, 1.0, aspect), vec4(1.0));
-        render.drawMesh(scene, "car", car.pos, car.rot, vec3(0.1) / vec3(aspect, 1.0, aspect), vec4(1.0));
+        // render.drawMesh(scene, "car", car.pos, car.rot, vec3(0.1) / vec3(aspect, 1.0, aspect), vec4(1.0));
         
         if (w.isKeyPressed("r")) {
             camera.rot = vec3(0.0);

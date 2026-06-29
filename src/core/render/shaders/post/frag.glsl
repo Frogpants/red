@@ -34,4 +34,5 @@ void main()
     vec3 color = col.rgb;
 
     FragColor = vec4(color, alpha);
+    // FragColor = texture(screenTex, TexCoord);
 }

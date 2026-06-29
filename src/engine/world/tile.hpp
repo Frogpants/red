@@ -16,7 +16,7 @@ struct Tile {
     vec2 tileC;
     vec2 tileS;
 
-    void update(RenderTexture& s, Render& r, Camera& cam, float WIDTH, std::vector<int>& world) {
+    void update(RenderTexture& s, Render& r, Camera& cam, float WIDTH, std::vector<int>& world, vec2 m) {
         vec3 temp = pos - cam.pos;
         if (abs(temp.x) > tileC.x * (tileS.x / 2.0)) {
             if (temp.x < 0.0) {
@@ -42,6 +42,7 @@ struct Tile {
         // if (index >= 0.0) {
         //     height = ((float)world[index]) * 0.002;
         // }
+
         r.drawMesh(s, "cube", pos + vec3(0.0, 2.0 * height, 0.0), vec3(0.0), vec3(0.01, 0.002 + height, 0.01) * 5.0);
     }
 };

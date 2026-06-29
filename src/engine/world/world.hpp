@@ -55,11 +55,11 @@ struct World {
         tiles.push_back(tile);
     }
 
-    void render(RenderTexture& s, Render& r, Camera& c) {
+    void render(RenderTexture& s, Render& r, Camera& c, vec2 m) {
         for (Tile& tile : tiles) {
             tile.tileC = tileC;
             tile.tileS = tileS;
-            tile.update(s, r, c, size.x, world);
+            tile.update(s, r, c, size.x, world, m);
         }
     }
 

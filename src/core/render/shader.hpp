@@ -157,25 +157,12 @@ public:
         glShaderSource(fragShader, 1, &fragSource, nullptr);
         glCompileShader(fragShader);
 
-        glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            char log[1024];
-            glGetShaderInfoLog(fragShader, 1024, NULL, log);
-            std::cout << "Vertex Shader:\n" << log << std::endl;
-        }
-
-
         program = glCreateProgram();
         
         glAttachShader(program, vertShader);
         glAttachShader(program, fragShader);
 
         glLinkProgram(program);
-
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-
-        std::cout << "Program linked = " << success << std::endl;
 
         glDeleteShader(vertShader);
         glDeleteShader(fragShader);
