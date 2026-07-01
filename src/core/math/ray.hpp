@@ -46,12 +46,10 @@ vec3 inverseRotate(vec3 p, vec3 rot)
 Ray mouseRay(vec2 mouseNDC, Camera& cam) {
     Ray ray;
 
-    vec3 local(mouseNDC.x / cam.focal, mouseNDC.y / cam.focal, 0.0f);
+    vec3 local(mouseNDC.x / cam.focal, mouseNDC.y / cam.focal, -1.0f);
 
-    ray.origin = cam.pos + inverseRotate(local, cam.rot);
-
-
-    ray.direction = inverseRotate(vec3(0.0f, 0.0f, -1.0f), cam.rot);
+    ray.origin = cam.pos;
+    ray.direction = normalize(inverseRotate(local, cam.rot));
     ray.direction = normalize(ray.direction);
 
     return ray;
@@ -91,5 +89,5 @@ bool rayTriangle(const Ray& ray, vec3 a, vec3 b, vec3 c, float& t) {
 
     t = dot(edge2, q) * invDet;
 
-    return t > EPS;
+    return t >= EPS;
 }

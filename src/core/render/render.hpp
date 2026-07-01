@@ -117,8 +117,8 @@ public:
             1, 1, 0,   1,1,
 
             -1,-1, 0,   0,0,
-            1, 1, 0,   1,1,
-            1,-1, 0,   1,0
+            1,-1, 0,   1,0,
+            1, 1, 0,   1,1
         };
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
@@ -136,8 +136,10 @@ public:
 
         if (depth) {
             glEnable(GL_DEPTH_TEST);
+            glEnable(GL_CULL_FACE);
         } else {
             glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, rt.fbo);

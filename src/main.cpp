@@ -214,7 +214,7 @@ int main() {
         render.beginFrame(ui, false);
 
 
-        render.drawRect(vec3(0.0), vec2(0.5), vec4(1.0));
+        // render.drawRect(vec3(0.0), vec2(0.5), vec4(1.0));
 
 
         render.endFrame();

@@ -189,7 +189,7 @@ public:
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    void setUniform(GLchar* name, float inp) {
+    void setUniform(const char* name, float inp) {
         GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
             GLint location = glGetUniformLocation(program, (GLchar*)name);
@@ -199,7 +199,7 @@ public:
         glUniform1f(l, inp);
     }
 
-    void setUniform(GLchar* name, double inp) {
+    void setUniform(const char* name, double inp) {
         GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
             GLint location = glGetUniformLocation(program, (GLchar*)name);
@@ -209,7 +209,7 @@ public:
         glUniform1f(l, (float)inp);
     }
 
-    void setUniform(GLchar* name, vec2 inp) {
+    void setUniform(const char* name, vec2 inp) {
         GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
             GLint location = glGetUniformLocation(program, (GLchar*)name);
@@ -219,7 +219,7 @@ public:
         glUniform2f(l, inp.x, inp.y);
     }
 
-    void setUniform(GLchar* name, vec3 inp) {
+    void setUniform(const char* name, vec3 inp) {
         GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
             GLint location = glGetUniformLocation(program, (GLchar*)name);
@@ -229,7 +229,7 @@ public:
         glUniform3f(l, inp.x, inp.y, inp.z);
     }
 
-    void setUniform(GLchar* name, vec4 inp) {
+    void setUniform(const char* name, vec4 inp) {
         GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
             GLint location = glGetUniformLocation(program, (GLchar*)name);
@@ -239,7 +239,7 @@ public:
         glUniform4f(l, inp.x, inp.y, inp.z, inp.w);
     }
 
-    void setUniform(GLchar* name, int inp) {
+    void setUniform(const char* name, int inp) {
         GLint l = checkSaved((GLchar*)name);
         if (l == -1) {
             GLint location = glGetUniformLocation(program, (GLchar*)name);
