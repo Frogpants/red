@@ -23,11 +23,24 @@ public:
     GLuint vbo = 0;
 
     GLsizei vertexCount = 0;
+    vec3 localMin = vec3(0.0f);
+    vec3 localMax = vec3(0.0f);
+    bool hasBounds = false;
 
     Mesh() = default;
 
     void upload(const std::vector<Vert>& vertices) {
         vertexCount = (GLsizei)vertices.size();
+
+        if (!vertices.empty()) {
+            localMin = vertices[0].position;
+            localMax = vertices[0].position;
+            for (const Vert& v : vertices) {
+                localMin = min(localMin, v.position);
+                localMax = max(localMax, v.position);
+            }
+            hasBounds = true;
+        }
 
         if (!vao) glGenVertexArrays(1, &vao);
         if (!vbo) glGenBuffers(1, &vbo);

@@ -44,9 +44,9 @@ public:
 
     void setupDemoLights(const vec3& cameraPos, const vec3& carPos) {
         lights.clear();
-        lights.push_back({cameraPos + vec3(-1.2f, 1.8f, -0.8f), 8.0f, vec3(1.0f, 0.94f, 0.82f), 1.25f});
-        lights.push_back({vec3(2.5f, 1.4f, 1.6f), 7.0f, vec3(0.45f, 0.65f, 1.0f), 0.85f});
-        lights.push_back({carPos + vec3(0.0f, 0.8f, 0.0f), 4.5f, vec3(1.0f, 0.42f, 0.18f), 0.95f});
+        // lights.push_back({cameraPos + vec3(-1.2f, 1.8f, -0.8f), 8.0f, vec3(1.0f, 0.94f, 0.82f), 1.25f});
+        lights.push_back({vec3(0.0, 1.0, 0.0), 14.0f, vec3(0.45f, 0.65f, 1.0f), 0.85f});
+        // lights.push_back({carPos + vec3(0.0f, 0.8f, 0.0f), 4.5f, vec3(1.0f, 0.42f, 0.18f), 0.95f});
     }
 
     void updateDemoLightPositions(const vec3& cameraPos, const vec3& carPos) {

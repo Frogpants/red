@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -45,27 +46,25 @@ private:
     GLuint quadVAO, quadVBO;
 
     std::vector<Vertex> vertices;
+    std::unordered_map<std::string, int> modelLookup;
     
 
     int MAX_VERTICES;
 
-    int checkModel(std::string name) {
-        int result = -1;
-        for (size_t i = 0; i < models.size(); i++) {
-            Model m = models[i];
-            if (m.name == name) {
-                result = i;
-                break;
-            }
+    int checkModel(const std::string& name) const {
+        auto it = modelLookup.find(name);
+        if (it == modelLookup.end()) {
+            return -1;
         }
 
-        return result;
+        return it->second;
     }
 
     void cache(std::string path, std::string name) {
         Model m;
         m.mesh = LoadOBJ(path);
         m.name = name;
+        modelLookup[name] = (int)models.size();
         models.push_back(m);
     }
 
@@ -80,6 +79,7 @@ public:
     Render() {
         clear = vec4(vec3(0.0), 1.0);
         MAX_VERTICES = 300000;
+        vertices.reserve(MAX_VERTICES);
     }
     
     void init() {
@@ -89,7 +89,7 @@ public:
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-        glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
         glEnableVertexAttribArray(0);
@@ -156,14 +156,12 @@ public:
             return;
         }
 
-        glBindFramebuffer(GL_FRAMEBUFFER, target->fbo);
-        glViewport(0, 0, target->width, target->height);
-
         activeShader->bind();
 
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
+        glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
@@ -288,6 +286,18 @@ public:
         }
     }
 
+    bool getModelLocalBounds(const std::string& modelName, vec3& outMin, vec3& outMax) const {
+        for (const Model& model : models) {
+            if (model.name == modelName && model.mesh.hasBounds) {
+                outMin = model.mesh.localMin;
+                outMax = model.mesh.localMax;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     void drawMesh(Mesh& mesh, vec3 position = vec3(0.0f), vec3 rotation = vec3(0.0f), vec3 scale = vec3(1.0f), vec4 color = vec4(1.0f)) {
         activeShader->bind();
 
@@ -312,10 +322,12 @@ public:
         models[c].mesh.draw();
     }
 
-    void drawMesh(RenderTexture& src, std::string c, vec3 position = vec3(0.0f), vec3 rotation = vec3(0.0f), vec3 scale = vec3(1.0f), vec4 color = vec4(1.0f)) {
+    void drawMesh(RenderTexture& src, const std::string& c, vec3 position = vec3(0.0f), vec3 rotation = vec3(0.0f), vec3 scale = vec3(1.0f), vec4 color = vec4(1.0f)) {
         src.triShader.bind();
         int index = checkModel(c);
-        Mesh m = models[index].mesh;
+        if (index < 0) {
+            return;
+        }
 
         src.triShader.setUniform((GLchar*)"modelPos", position);
         src.triShader.setUniform((GLchar*)"modelRot", rotation);
@@ -323,6 +335,6 @@ public:
 
         src.triShader.setUniform((GLchar*)"modelColor", color);
 
-        m.draw();
+        models[index].mesh.draw();
     }
 };

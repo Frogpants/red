@@ -55,6 +55,10 @@ int main() {
     render.addModel("moon", "src/assets/models/objs/Moon-2K.obj");
     render.addModel("car", "src/assets/models/objs/Dodge_Charger_Low.obj");
 
+    float aspect = 1280.0f / 720.0f;
+    vec3 playerScale = vec3(0.004f, 0.01777f, 0.004f) * 5.0f;
+    vec3 carScale = vec3(0.1f) / vec3(aspect, 1.0f, aspect);
+
 
     Player player;
     player.pos = vec3(0.0, 0.15, 0.0);
@@ -103,8 +107,10 @@ int main() {
 
     float av = 0.0;
 
-    float aspect = 1280.0/720.0;
     int tick = 0;
+
+    bool complexLightingEnabled = true;
+    bool lightingToggleLatch = false;
 
     float t;
     Ray mRay = mouseRay(w.mouse, camera);
@@ -161,17 +167,30 @@ int main() {
             player.inVehicle = false;
         }
 
-        player.vel = player.vel * 0.9;
+        bool lightingTogglePressed = w.isKeyPressed("l");
+        if (lightingTogglePressed && !lightingToggleLatch) {
+            complexLightingEnabled = !complexLightingEnabled;
+            lightingToggleLatch = true;
+            std::cout << "Complex lighting: " << (complexLightingEnabled ? "ON" : "OFF") << std::endl;
+        } else if (!lightingTogglePressed) {
+            lightingToggleLatch = false;
+        }
+
+        player.vel = player.vel * 0.9f;
         player.pos = player.pos + player.vel;
 
-        car.vel = car.vel + car.accel * 0.1;
-        car.vel = car.vel * 0.9;
+        car.vel = car.vel + car.accel * 0.1f;
+        car.vel = car.vel * 0.9f;
         car.pos = car.pos + car.vel;
+        car.accel = vec3(0.0f);
+
         car.rv = car.rv * 0.9;
         car.dir = car.dir + car.rv.x;
         car.rot.x = car.dir + 135.0;
 
-        
+        if (player.inVehicle) {
+            player.pos = car.pos + vec3(0.0f, 0.15f, 0.0f);
+        }
 
         player.rot.x = (-180.0 * atan2((w.mouse.y + camera.pos.z) - player.pos.z, (w.mouse.x + camera.pos.x) - player.pos.x)) / 3.14159;
 
@@ -181,27 +200,31 @@ int main() {
             camera.follow(player.pos, 0.05);
         }
 
-        lighting.updateDemoLightPositions(camera.pos, car.pos);
-
-        vec3 shadowRight;
-        vec3 shadowUp;
-        vec3 shadowForward;
-        lighting.updateShadowBasis(shadowRight, shadowUp, shadowForward);
-
-        lighting.bindShadowUniforms(lighting.shadow.triShader, camera, shadowRight, shadowUp, shadowForward, 18.0f);
-
-        render.beginFrame(lighting.shadow);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, moon.texture);
-        lighting.shadow.triShader.setUniform("modelColor", vec4(1.0f));
-
-        if (!player.inVehicle) {
-            render.drawMesh(lighting.shadow, "cube", player.pos, player.rot, vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
+        if (complexLightingEnabled) {
+            lighting.updateDemoLightPositions(camera.pos, car.pos);
         }
-        world.render(lighting.shadow, render, camera, w.mouse);
-        render.drawMesh(lighting.shadow, "car", car.pos, car.rot, vec3(0.1) / vec3(aspect, 1.0, aspect), vec4(1.0));
-        render.endFrame();
+
+        vec3 shadowRight = vec3(1.0f, 0.0f, 0.0f);
+        vec3 shadowUp = vec3(0.0f, 1.0f, 0.0f);
+        vec3 shadowForward = vec3(0.0f, 0.0f, 1.0f);
+        if (complexLightingEnabled) {
+            lighting.updateShadowBasis(shadowRight, shadowUp, shadowForward);
+
+            lighting.bindShadowUniforms(lighting.shadow.triShader, camera, shadowRight, shadowUp, shadowForward, 18.0f);
+
+            render.beginFrame(lighting.shadow);
+
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, moon.texture);
+            lighting.shadow.triShader.setUniform("modelColor", vec4(1.0f));
+
+            if (!player.inVehicle) {
+                render.drawMesh(lighting.shadow, "cube", player.pos, player.rot, playerScale, vec4(1.0, 0.5, 0.5, 1.0));
+            }
+            world.render(lighting.shadow, render, camera, w.mouse);
+            render.drawMesh(lighting.shadow, "car", car.pos, car.rot, carScale, vec4(1.0));
+            render.endFrame();
+        }
 
         render.beginFrame(scene);
 
@@ -213,14 +236,22 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, moon.texture);
         scene.triShader.setUniform("tex", 1);
 
-        scene.triShader.setUniform("ambient", vec3(0.15));
+        scene.triShader.setUniform("ambient", complexLightingEnabled ? vec3(0.15f) : vec3(0.55f));
 
-        lighting.bindSceneUniforms(scene.triShader, camera, shadowRight, shadowUp, shadowForward, 18.0f, 0.02f);
-        lighting.bindTextures(scene.triShader);
-        lighting.updateLightBuffer(scene.triShader);
+        if (complexLightingEnabled) {
+            lighting.bindSceneUniforms(scene.triShader, camera, shadowRight, shadowUp, shadowForward, 18.0f, 0.02f);
+            lighting.bindTextures(scene.triShader);
+            lighting.updateLightBuffer(scene.triShader);
+        } else {
+            scene.triShader.setUniform("cameraPos", camera.pos);
+            scene.triShader.setUniform("worldLightDir", vec3(0.0f, -1.0f, 0.0f));
+            scene.triShader.setUniform("worldLightColor", vec3(1.0f));
+            scene.triShader.setUniform("worldLightIntensity", 0.0f);
+            scene.triShader.setUniform("lightCount", 0);
+        }
 
         if (!player.inVehicle) {
-            render.drawMesh(scene, "cube", player.pos, player.rot, vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
+            render.drawMesh(scene, "cube", player.pos, player.rot, playerScale, vec4(1.0, 0.5, 0.5, 1.0));
         }
 
         world.render(scene, render, camera, w.mouse);
