@@ -130,11 +130,15 @@ public:
         glEnableVertexAttribArray(2);
     }
 
-    void beginFrame(RenderTexture& rt) {
-        target = &rt;
-        activeShader = &rt.triShader;
+    void beginFrame(RenderTexture& rt, bool depth = true) {
+        target=&rt;
+        activeShader=&rt.triShader;
 
-        glEnable(GL_DEPTH_TEST);
+        if (depth) {
+            glEnable(GL_DEPTH_TEST);
+        } else {
+            glDisable(GL_DEPTH_TEST);
+        }
 
         glBindFramebuffer(GL_FRAMEBUFFER, rt.fbo);
         glViewport(0, 0, rt.width, rt.height);
@@ -165,17 +169,28 @@ public:
         vertices.clear();
     }
 
-    void drawTexture(RenderTexture& src) {
+    void drawTexture(RenderTexture& src)
+    {
         activeShader = &target->postShader;
 
         activeShader->bind();
 
-        activeShader->setTexture("screenTex", src.texture);
+        activeShader->setTexture("sceneTex", src.texture, 0);
+        activeShader->setTexture("uiTex", src.texture, 1);
+        activeShader->setUniform("hasUi", 0);
 
         drawQuad(vec2(-1.0f, -1.0f), vec2(-1.0f,  1.0f), vec2( 1.0f,  1.0f), vec2( 1.0f, -1.0f), vec4(1.0f));
     }
 
     void present(RenderTexture& src, int width, int height) {
+        present(src, src, nullptr, width, height);
+    }
+
+    void present(RenderTexture& src, RenderTexture& scene, int width, int height) {
+        present(src, scene, nullptr, width, height);
+    }
+
+    void present(RenderTexture& src, RenderTexture& scene, RenderTexture* overlay, int width, int height) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, width, height);
 
@@ -184,8 +199,14 @@ public:
         src.postShader.bind();
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, src.texture);
-        src.postShader.setUniform("screenTex", 0);
+        glBindTexture(GL_TEXTURE_2D, scene.texture);
+        src.postShader.setUniform("sceneTex", 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, overlay != nullptr ? overlay->texture : scene.texture);
+        src.postShader.setUniform("uiTex", 1);
+
+        src.postShader.setUniform("hasUi", overlay != nullptr ? 1 : 0);
 
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -224,14 +245,13 @@ public:
     }
 
     void drawQuad(vec3 a, vec3 b, vec3 c, vec3 d, vec4 color) {
-        vec3 n = findNormal(a, b, c);
-        vertices.push_back({a, color, vec2(0.0), n});
-        vertices.push_back({b, color, vec2(0.0, 1.0), n});
-        vertices.push_back({c, color, vec2(1.0), n});
+        vertices.push_back({a, color, vec2(0.0)});
+        vertices.push_back({b, color, vec2(0.0, 1.0)});
+        vertices.push_back({c, color, vec2(1.0)});
 
-        vertices.push_back({a, color, vec2(0.0), n});
-        vertices.push_back({d, color, vec2(1.0, 0.0), n});
-        vertices.push_back({c, color, vec2(1.0), n});
+        vertices.push_back({a, color, vec2(0.0)});
+        vertices.push_back({d, color, vec2(1.0, 0.0)});
+        vertices.push_back({c, color, vec2(1.0)});
     }
 
     void drawRect(vec2 pos, vec2 size, vec4 color) {

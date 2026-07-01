@@ -87,8 +87,8 @@ int main() {
     RenderTexture post;
     post.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
 
-    // RenderTexture post;
-    // post.create(1280, 720, "game/vert.glsl", "game/frag.glsl", "post/vert.glsl", "post/frag.glsl");
+    RenderTexture ui;
+    ui.create(1280, 720, "ui/vert.glsl", "ui/frag.glsl", "post/vert.glsl", "post/frag.glsl");
 
 
     vec2 start = vec2(0.0);
@@ -209,12 +209,20 @@ int main() {
         render.endFrame();
 
 
-        render.beginFrame(post);
-        render.drawTexture(scene);
+        // ui
+        render.clear = vec4(0,0,0,0);
+        render.beginFrame(ui, false);
+
+
+        render.drawRect(vec3(0.0), vec2(0.5), vec4(1.0));
+
+
         render.endFrame();
+        render.clear = vec4(0,0,0,1);
 
 
-        render.present(post, 1280, 720);
+
+        render.present(post, scene, &ui, 1280, 720);
 
 
         w.swapBuffers();
