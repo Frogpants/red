@@ -17,7 +17,7 @@ struct RenderTexture {
     int width = 0;
     int height = 0;
 
-    void create(int w, int h, std::string triVert, std::string triFrag, std::string postVert, std::string postFrag) {
+    void create(int w, int h, std::string triVert, std::string triFrag, std::string postVert, std::string postFrag, GLenum internalFormat = GL_RGBA8, GLenum format = GL_RGBA, GLenum type = GL_UNSIGNED_BYTE) {
         width = w;
         height = h;
 
@@ -30,7 +30,7 @@ struct RenderTexture {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, nullptr);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

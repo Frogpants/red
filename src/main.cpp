@@ -1,9 +1,11 @@
 #include <iostream>
+#include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "core/render/window.hpp"
 #include "core/render/render.hpp"
+#include "core/render/lighting.hpp"
 #include "core/render/rendertexture.hpp"
 #include "core/render/camera.hpp"
 
@@ -69,6 +71,9 @@ int main() {
     Camera camera;
     camera.pos = vec3(0.0);
 
+    Lighting lighting;
+    lighting.init(1024, 1024);
+
 
     World world;
     world.tileC = vec2(10.0);
@@ -90,6 +95,8 @@ int main() {
     RenderTexture ui;
     ui.create(1280, 720, "ui/vert.glsl", "ui/frag.glsl", "post/vert.glsl", "post/frag.glsl");
 
+    lighting.setupDemoLights(camera.pos, car.pos);
+
 
     vec2 start = vec2(0.0);
 
@@ -104,20 +111,6 @@ int main() {
 
     while (w.isOpen()) {
         w.pollEvents();
-        render.beginFrame(scene);
-
-        scene.triShader.bind();
-        scene.triShader.setUniform("cam", camera.pos);
-        scene.triShader.setUniform("rot", camera.rot);
-        scene.triShader.setUniform("f", camera.focal);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, moon.texture);
-        scene.triShader.setUniform("tex", 1);
-
-        scene.triShader.setUniform("lightDir", vec3(0.5f, 1.0f, 0.4f));
-
-        scene.triShader.setUniform("lightColor", vec3(1.0f));
-        scene.triShader.setUniform("ambient", vec3(0.15));
 
         tick += 1;
 
@@ -185,8 +178,49 @@ int main() {
         if (player.inVehicle) {
             camera.follow(car.pos, 0.05);
         } else {
-            render.drawMesh(scene, "cube", player.pos, player.rot, vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
             camera.follow(player.pos, 0.05);
+        }
+
+        lighting.updateDemoLightPositions(camera.pos, car.pos);
+
+        vec3 shadowRight;
+        vec3 shadowUp;
+        vec3 shadowForward;
+        lighting.updateShadowBasis(shadowRight, shadowUp, shadowForward);
+
+        lighting.bindShadowUniforms(lighting.shadow.triShader, camera, shadowRight, shadowUp, shadowForward, 18.0f);
+
+        render.beginFrame(lighting.shadow);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, moon.texture);
+        lighting.shadow.triShader.setUniform("modelColor", vec4(1.0f));
+
+        if (!player.inVehicle) {
+            render.drawMesh(lighting.shadow, "cube", player.pos, player.rot, vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
+        }
+        world.render(lighting.shadow, render, camera, w.mouse);
+        render.drawMesh(lighting.shadow, "car", car.pos, car.rot, vec3(0.1) / vec3(aspect, 1.0, aspect), vec4(1.0));
+        render.endFrame();
+
+        render.beginFrame(scene);
+
+        scene.triShader.bind();
+        scene.triShader.setUniform("cam", camera.pos);
+        scene.triShader.setUniform("rot", camera.rot);
+        scene.triShader.setUniform("f", camera.focal);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, moon.texture);
+        scene.triShader.setUniform("tex", 1);
+
+        scene.triShader.setUniform("ambient", vec3(0.15));
+
+        lighting.bindSceneUniforms(scene.triShader, camera, shadowRight, shadowUp, shadowForward, 18.0f, 0.02f);
+        lighting.bindTextures(scene.triShader);
+        lighting.updateLightBuffer(scene.triShader);
+
+        if (!player.inVehicle) {
+            render.drawMesh(scene, "cube", player.pos, player.rot, vec3(0.004, 0.01777, 0.004) * 5.0, vec4(1.0, 0.5, 0.5, 1.0));
         }
 
         world.render(scene, render, camera, w.mouse);

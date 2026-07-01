@@ -10,6 +10,10 @@ uniform vec3 cam;
 uniform vec3 rot;
 uniform float f;
 
+uniform vec3 shadowCam;
+uniform vec3 shadowRot;
+uniform float shadowF;
+
 uniform vec3 modelPos;
 uniform vec3 modelRot;
 uniform vec3 modelScale;
@@ -90,6 +94,32 @@ vec3 project(vec3 point) {
 
 
     return vec3(p.xy * f, -p.z);
+}
+
+vec3 projectShadow(vec3 point) {
+    vec3 p = point - shadowCam;
+
+    vec3 trig = radians(shadowRot);
+
+    float tx = p.x;
+    float tz = p.z;
+
+    p.x = tx * cos(trig.x) - tz * sin(trig.x);
+    p.z = tx * sin(trig.x) + tz * cos(trig.x);
+
+    float ty = p.y;
+    tz = p.z;
+
+    p.y = ty * cos(trig.y) - tz * sin(trig.y);
+    p.z = ty * sin(trig.y) + tz * cos(trig.y);
+
+    tx = p.x;
+    ty = p.y;
+
+    p.x = tx * cos(trig.z) - ty * sin(trig.z);
+    p.y = tx * sin(trig.z) + ty * cos(trig.z);
+
+    return vec3(p.xy * shadowF, -p.z);
 }
 
 void main()
